@@ -1,0 +1,39 @@
+flowchart LR
+    user(["Approver or Admin"])
+    finance(["Finance"])
+
+    subgraph appsvc["Azure App Service, 3 instances (planned hosting)"]
+        ui["Static web UI (exists)"]
+        api["InvoiceApp.Api controllers (exists)"]
+        domain["ApprovalService (exists)<br/>plus second approver over $1,000 (planned, UC-1)"]
+        dispatcher["PayEx dispatcher<br/>BackgroundService (planned)"]
+        recon["Daily reconciliation<br/>read-only (planned)"]
+    end
+
+    sql[("Azure SQL (planned)<br/>Invoices, ApprovalAudit append-only 7 years,<br/>PaymentSubmission outbox")]
+    sessions[("Shared session store (planned)<br/>SessionStore is in memory today")]
+    kv["Key Vault: PayEx key (planned)"]
+    insights["Application Insights alerts (planned)<br/>oldest unpaid approval, Unknown, heartbeat"]
+    sb["Service Bus topic (provisioned, unused)<br/>notifications only, later"]
+    payex["PayEx API (external)"]
+
+    user --> ui
+    user --> api
+    api --> domain
+    api --> sessions
+    domain -->|"one transaction: invoice, audit, outbox row"| sql
+    dispatcher -->|"claim due rows with a lease"| sql
+    dispatcher -->|"POST payment, idempotency key"| payex
+    dispatcher -->|"API key"| kv
+    dispatcher --> insights
+    recon -->|"daily report"| payex
+    recon -->|"compare"| sql
+    recon -->|"mismatch report"| finance
+    sql -.->|"approval events from the same outbox, later"| sb
+
+    classDef planned stroke-dasharray: 6 4,fill:#fff7e6,stroke:#b7791f,color:#16202a
+    classDef exists fill:#e6f4f1,stroke:#0f766e,color:#16202a
+    classDef external fill:#eef1f5,stroke:#4f5b67,color:#16202a
+    class dispatcher,recon,sql,sessions,kv,insights,sb planned
+    class ui,api,domain exists
+    class payex external

@@ -1,0 +1,48 @@
+# Approval path, driven against the running app (2026-10-29T17:44Z)
+# dotnet run --project backend/src/InvoiceApp.Api --urls http://localhost:5055   (DOTNET_ROLL_FORWARD=Major)
+
+$ curl -s -o /dev/null -w 'HTTP %{http_code}' http://localhost:5055/
+HTTP 200
+
+$ curl -s -w '  HTTP %{http_code}' http://localhost:5055/api/invoices
+  HTTP 401
+
+$ curl -s -X POST http://localhost:5055/api/auth/login -d '{"username":"demo.approver","password":"***"}'   -> token issued (32 hex chars)
+
+$ curl -s -w '  HTTP %{http_code}' -X POST http://localhost:5055/api/approvals/INV-1001/approve -H "Authorization: Bearer $TOKEN"
+{"id":"INV-1001","customerName":"Lakeside School District","amount":4250.00,"status":"Approved","createdAt":"2026-10-29T17:44:56.702082Z","decidedBy":"demo.approver","decidedAt":"2026-10-29T17:44:56.702873Z","decisionNote":null}  HTTP 200
+
+$ curl -s -w '  HTTP %{http_code}' -X POST http://localhost:5055/api/approvals/INV-1001/approve -H "Authorization: Bearer $TOKEN"
+{"error":"Invoice INV-1001 is Approved; only pending invoices can be decided."}  HTTP 409
+
+$ curl -s -w '  HTTP %{http_code}' -X POST http://localhost:5055/api/approvals/INV-404/approve -H "Authorization: Bearer $TOKEN"
+{"error":"Invoice INV-404 was not found."}  HTTP 404
+
+$ curl -s -w '  HTTP %{http_code}' -X POST http://localhost:5055/api/approvals/INV-1002/reject -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"reason":"  "}'
+{"error":"A reason is required to reject an invoice. (Parameter 'reason')"}  HTTP 400
+
+$ curl -s -w '  HTTP %{http_code}' -X POST http://localhost:5055/api/approvals/INV-1004/approve
+  HTTP 401
+
+$ curl -s -w '  HTTP %{http_code}' -X POST http://localhost:5055/api/invoices/INV-1005/approve -H "Authorization: Bearer $TOKEN"
+  HTTP 404
+
+# demo.admin is also allowed on approvals, so no configured user can reach the 403 branch
+$ curl -s -w '  HTTP %{http_code}' -X POST http://localhost:5055/api/approvals/INV-1004/approve -H "Authorization: Bearer $ADMIN"
+{"id":"INV-1004","customerName":"Oakwood Independent","amount":615.75,"status":"Approved","createdAt":"2026-10-29T17:44:56.702143Z","decidedBy":"demo.admin","decidedAt":"2026-10-29T17:44:56.77323Z","decisionNote":null}  HTTP 200
+
+$ curl -s -o /dev/null -w 'HTTP %{http_code}' -X POST http://localhost:5055/api/auth/logout -H "Authorization: Bearer $TOKEN"
+HTTP 204
+
+$ curl -s -o /dev/null -w 'HTTP %{http_code}' http://localhost:5055/api/invoices -H "Authorization: Bearer $TOKEN"
+HTTP 401
+
+# after sign-out the old token is rejected, but the data is unchanged for a new session:
+$ curl -s http://localhost:5055/api/invoices/INV-1001 -H "Authorization: Bearer $TOKEN2"
+{"id":"INV-1001","customerName":"Lakeside School District","amount":4250.00,"status":"Approved","createdAt":"2026-10-29T17:44:56.702082Z","decidedBy":"demo.approver","decidedAt":"2026-10-29T17:44:56.702873Z","decisionNote":null}
+
+
+$ python3 docs/architecture/check_citations.py
+58/58 citations verified
+$ python3 docs/architecture/check_citations.py
+65/65 citations verified

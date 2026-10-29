@@ -1,0 +1,40 @@
+sequenceDiagram
+    autonumber
+    actor Approver
+    box rgb(230,244,241) Exists today
+        participant API as ApprovalsController
+        participant Svc as ApprovalService
+    end
+    box rgb(255,247,230) Planned, not built yet
+        participant DB as Azure SQL
+        participant W as PayEx dispatcher
+        participant R as Daily reconciliation
+    end
+    participant P as PayEx (external)
+
+    Approver->>API: POST /api/approvals/{id}/approve
+    API->>Svc: Approve(id, approver)
+    Svc->>DB: one transaction: invoice to Approved only if still pending,<br/>ApprovalAudit row, PaymentSubmission row with key and payload
+    alt invoice no longer pending
+        DB-->>API: 0 rows updated
+        API-->>Approver: 409
+    else committed
+        API-->>Approver: 200, Approved, awaiting PayEx
+    end
+    loop every 2 s on each instance
+        W->>DB: claim due rows, READPAST and UPDLOCK, 2 min lease, attempts + 1
+    end
+    W->>P: POST stored payload with the idempotency key, 40 s timeout
+    alt success
+        P-->>W: reference
+        W->>DB: Submitted with reference, only while holding the lease
+    else 400 or 422
+        W->>DB: Rejected, routed to finance
+    else timeout
+        W->>DB: Unknown
+        W->>P: look up by key or reference before any retry
+    else 401, 403, 429 or 5xx
+        W->>W: open circuit, leave rows untouched, alert
+    end
+    R->>P: daily report, read-only
+    R->>DB: compare Submitted and Unknown, report mismatches

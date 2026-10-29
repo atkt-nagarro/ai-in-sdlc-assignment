@@ -1,0 +1,48 @@
+flowchart LR
+    user(["Approver or Admin"])
+
+    subgraph browser["Browser"]
+        page["index.html + app.js"]
+        token[("sessionStorage 'session'<br/>token, username, role")]
+    end
+
+    subgraph proc["InvoiceApp.Api: one ASP.NET Core 8 process"]
+        ui["Static files<br/>UseDefaultFiles + UseStaticFiles<br/>no sign-in needed"]
+        mw["SessionAuthMiddleware<br/>bearer token on /api/* except login"]
+        authc["AuthController<br/>api/auth/login, logout"]
+        invc["InvoicesController<br/>api/invoices: list, get, create,<br/>submit, delete (Admin)"]
+        appc["ApprovalsController<br/>api/approvals/{id}/approve, reject<br/>RequireRole Approver, Admin"]
+        handle["ApiControllerBase.Handle<br/>404, 409, 400 mapping"]
+        svc["ApprovalService<br/>Domain, scoped"]
+        repo[("InMemoryInvoiceRepository<br/>singleton, List + lock,<br/>seeded INV-1001..1005")]
+        sessions[("SessionStore<br/>singleton, tokens in memory")]
+        users["appsettings.json Users<br/>DemoUsersOptions"]
+        unused["Present but never called:<br/>DiscountCalculator,<br/>IInvoiceRepository.GetByIds"]
+    end
+
+    subgraph build["Build and test"]
+        ci["GitHub Actions ci.yml<br/>dotnet build, dotnet test"]
+        tests["InvoiceApp.Tests, xUnit<br/>references Domain only"]
+        e2e["e2e Playwright config<br/>no tests yet"]
+    end
+
+    user --> page
+    page -->|"GET /, app.js"| ui
+    page <-->|"save, read, clear"| token
+    page -->|"fetch /api/... with Bearer token"| mw
+    mw -->|"Get(token)"| sessions
+    mw --> authc
+    mw --> invc
+    mw --> appc
+    authc -->|"check username, password"| users
+    authc -->|"Create, Remove token"| sessions
+    appc --> handle
+    invc -->|"submit"| handle
+    handle --> svc
+    invc -->|"GetAll, GetById, Add, Remove"| repo
+    svc -->|"GetById, Update"| repo
+    ci --> tests
+    tests -->|"project reference"| svc
+
+    classDef unusedStyle stroke-dasharray: 4 4,fill:#f4f1ea,stroke:#4f5b67,color:#4f5b67
+    class unused unusedStyle

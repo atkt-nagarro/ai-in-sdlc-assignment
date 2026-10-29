@@ -1,0 +1,49 @@
+diff --git a/backend/src/InvoiceApp.Domain/ApprovalService.cs b/backend/src/InvoiceApp.Domain/ApprovalService.cs
+--- a/backend/src/InvoiceApp.Domain/ApprovalService.cs
++++ b/backend/src/InvoiceApp.Domain/ApprovalService.cs
+@@ -28,18 +28,9 @@ public class ApprovalService
+         return invoice;
+     }
+ 
+-    public Invoice Approve(string invoiceId, string approver)
+-    {
+-        var invoice = Find(invoiceId);
+-        EnsurePending(invoice);
++    public Invoice Approve(string invoiceId, string approver) =>
++        Decide(invoiceId, approver, InvoiceStatus.Approved, decisionNote: null);
+ 
+-        invoice.Status = InvoiceStatus.Approved;
+-        invoice.DecidedBy = approver;
+-        invoice.DecidedAt = DateTime.UtcNow;
+-        _repository.Update(invoice);
+-        return invoice;
+-    }
+-
+     public Invoice Reject(string invoiceId, string approver, string reason)
+     {
+         if (string.IsNullOrWhiteSpace(reason))
+@@ -47,13 +38,22 @@ public class ApprovalService
+             throw new ArgumentException("A reason is required to reject an invoice.", nameof(reason));
+         }
+ 
++        return Decide(invoiceId, approver, InvoiceStatus.Rejected, reason);
++    }
++
++    private Invoice Decide(string invoiceId, string approver, InvoiceStatus outcome, string? decisionNote)
++    {
+         var invoice = Find(invoiceId);
+         EnsurePending(invoice);
+ 
+-        invoice.Status = InvoiceStatus.Rejected;
++        invoice.Status = outcome;
+         invoice.DecidedBy = approver;
+         invoice.DecidedAt = DateTime.UtcNow;
+-        invoice.DecisionNote = reason;
++        if (decisionNote is not null)
++        {
++            invoice.DecisionNote = decisionNote;
++        }
++
+         _repository.Update(invoice);
+         return invoice;
+     }

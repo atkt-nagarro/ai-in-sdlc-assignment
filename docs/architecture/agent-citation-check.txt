@@ -1,0 +1,103 @@
+ok   P1    Api/appsettings.json:9  "Users": [
+ok   P1    Api/Controllers/ApprovalsController.cs:9  [RequireRole("Approver", "Admin")]
+ok   C2    app.js:4  let session = JSON.parse(sessionStorage.getItem('session') || 'null');
+ok   C2    app.js:108  sessionStorage.setItem('session', JSON.stringify(session));
+ok   C2    app.js:95  sessionStorage.removeItem('session');
+ok   C3    Api/Program.cs:6  var builder = WebApplication.CreateBuilder(args);
+ok   C3    Api/InvoiceApp.Api.csproj:1  <Project Sdk="Microsoft.NET.Sdk.Web">
+ok   C3    Api/Properties/launchSettings.json:6  "applicationUrl": "http://localhost:5000",
+ok   C4    Program.cs:19  app.UseDefaultFiles();
+ok   C5    Program.cs:21  app.UseMiddleware<SessionAuthMiddleware>();
+ok   C5    Api/Auth/SessionAuthMiddleware.cs:16  public async Task InvokeAsync(HttpContext context)
+ok   C6    Program.cs:9  .AddControllers()
+ok   C6    ApiControllerBase.cs:9  protected ActionResult<Invoice> Handle(Func<Invoice> action)
+ok   C6    Api/Auth/RequireRoleAttribute.cs:8  public class RequireRoleAttribute : ActionFilterAttribute
+ok   C7    Program.cs:15  builder.Services.AddScoped<ApprovalService>();
+ok   C7    InvoiceApp.Api.csproj:8  <ProjectReference Include="..\InvoiceApp.Domain\InvoiceApp.Domain.csproj" />
+ok   C8    Program.cs:13  builder.Services.AddSingleton<SessionStore>();
+ok   C8    Api/Auth/SessionStore.cs:9  private readonly ConcurrentDictionary<string, UserSession> _sessions = new();
+ok   C9    Program.cs:14  builder.Services.AddSingleton<IInvoiceRepository, InMemoryInvoiceRepository>();
+ok   C9    Api/InMemoryInvoiceRepository.cs:6  public class InMemoryInvoiceRepository : IInvoiceRepository
+ok   C10   Program.cs:12  builder.Services.Configure<DemoUsersOptions>(builder.Configuration);
+ok   C10   appsettings.json:9  "Users": [
+ok   C10   Api/Auth/UserSession.cs:12  public class DemoUsersOptions
+ok   E1    app.js:68  const approve = el('button', { type: 'button', 'aria-label': `Approve invoice ${
+ok   E1    app.js:99  $('login-form').addEventListener('submit', async (event) => {
+ok   E1    index.html:21  <form id="login-form">
+ok   E2    Program.cs:19  app.UseDefaultFiles();
+ok   E2    index.html:7  <link rel="stylesheet" href="styles.css">
+ok   E2    SessionAuthMiddleware.cs:19  var needsSession = path.StartsWithSegments("/api") && !path.StartsWithSegments("
+ok   E3    app.js:4  let session = JSON.parse(sessionStorage.getItem('session') || 'null');
+ok   E4    app.js:16  async function api(path, options = {}) {
+ok   E5    SessionAuthMiddleware.cs:25  var session = _sessions.Get(token);
+ok   E5    SessionStore.cs:18  public UserSession? Get(string? token) =>
+ok   E6    SessionAuthMiddleware.cs:33  context.Items[HttpContextExtensions.SessionKey] = session;
+ok   E6    Program.cs:22  app.MapControllers();
+ok   E7    AuthController.cs:26  var user = _options.Users.FirstOrDefault(u =>
+ok   E8    AuthController.cs:34  var token = _sessions.Create(new UserSession(user.Username, user.Role));
+ok   E8    SessionStore.cs:11  public string Create(UserSession session)
+ok   E9    InvoicesController.cs:70  public ActionResult<Invoice> Submit(string id) => Handle(() => _approvals.Submit
+ok   E9    ApprovalsController.cs:23  Handle(() => _approvals.Approve(invoiceId, HttpContext.GetSession().Username));
+ok   E10   ApprovalService.cs:27  _repository.Update(invoice);
+ok   E10   Domain/IInvoiceRepository.cs:5  IReadOnlyList<Invoice> GetAll();
+ok   E10   Program.cs:14  builder.Services.AddSingleton<IInvoiceRepository, InMemoryInvoiceRepository>();
+ok   E11   InvoicesController.cs:25  var invoices = _repository.GetAll();
+ok   Participants SessionAuthMiddleware.cs:4  public class SessionAuthMiddleware
+ok   Participants SessionStore.cs:7  public class SessionStore
+ok   Participants RequireRoleAttribute.cs:8  public class RequireRoleAttribute : ActionFilterAttribute
+ok   Participants ApprovalsController.cs:10  public class ApprovalsController : ApiControllerBase
+ok   Participants ApiControllerBase.cs:6  public abstract class ApiControllerBase : ControllerBase
+ok   Participants ApprovalService.cs:7  public class ApprovalService
+ok   Participants InMemoryInvoiceRepository.cs:6  public class InMemoryInvoiceRepository : IInvoiceRepository
+ok   Participants InvoicesController.cs:9  public class InvoicesController : ApiControllerBase
+ok   1     app.js:68  const approve = el('button', { type: 'button', 'aria-label': `Approve invoice ${
+ok   1     app.js:72  approve.addEventListener('click', () => decide(`/approvals/${invoice.id}/approve
+ok   2     app.js:72  approve.addEventListener('click', () => decide(`/approvals/${invoice.id}/approve
+ok   2     app.js:82  async function decide(path, payload) {
+ok   3     app.js:85  await api(path, { method: 'POST', body: JSON.stringify(payload) });
+ok   3     app.js:17  const headers = { 'Content-Type': 'application/json', ...(options.headers || {})
+ok   3     ApprovalsController.cs:8  [Route("api/[controller]")]
+ok   4     SessionAuthMiddleware.cs:19  var needsSession = path.StartsWithSegments("/api") && !path.StartsWithSegments("
+ok   5     SessionStore.cs:18  public UserSession? Get(string? token) =>
+ok   6     SessionAuthMiddleware.cs:27  if (session is null)
+ok   7     app.js:20  if (response.status === 401 && session) { signOut(); throw new Error('Session ex
+ok   8     SessionAuthMiddleware.cs:33  context.Items[HttpContextExtensions.SessionKey] = session;
+ok   9     SessionAuthMiddleware.cs:36  await _next(context);
+ok   9     RequireRoleAttribute.cs:17  public override void OnActionExecuting(ActionExecutingContext context)
+ok   9     ApprovalsController.cs:9  [RequireRole("Approver", "Admin")]
+ok   10    RequireRoleAttribute.cs:21  if (session is null || !_roles.Contains(session.Role))
+ok   11    ApprovalsController.cs:21  [HttpPost("{invoiceId}/approve")]
+ok   12    ApprovalsController.cs:23  Handle(() => _approvals.Approve(invoiceId, HttpContext.GetSession().Username));
+ok   12    ApiControllerBase.cs:9  protected ActionResult<Invoice> Handle(Func<Invoice> action)
+ok   12    SessionAuthMiddleware.cs:44  public static UserSession GetSession(this HttpContext context) =>
+ok   13    ApprovalService.cs:33  var invoice = Find(invoiceId);
+ok   14    InMemoryInvoiceRepository.cs:25  public Invoice? GetById(string id)
+ok   15    ApprovalService.cs:63  ?? throw new KeyNotFoundException($"Invoice {invoiceId} was not found.");
+ok   16    ApiControllerBase.cs:15  catch (KeyNotFoundException ex)
+ok   17    ApprovalService.cs:34  EnsurePending(invoice);
+ok   18    ApiControllerBase.cs:19  catch (InvalidOperationException ex)
+ok   19    ApprovalService.cs:36  invoice.Status = InvoiceStatus.Approved;
+ok   20    ApprovalService.cs:39  _repository.Update(invoice);
+ok   21    InMemoryInvoiceRepository.cs:50  public void Update(Invoice invoice)
+ok   22    ApprovalService.cs:40  return invoice;
+ok   23    ApiControllerBase.cs:13  return Ok(action());
+ok   23    Program.cs:10  .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumCo
+ok   24    app.js:21  const body = response.status === 204 ? null : await response.json().catch(() => 
+ok   24    app.js:87  } catch (error) {
+ok   24    index.html:69  <p id="decision-error" role="alert" hidden></p>
+ok   25    app.js:86  await refresh();
+ok   25    app.js:40  async function refresh() {
+ok   25    InvoicesController.cs:22  [HttpGet]
+ok   26–27 SessionAuthMiddleware.cs:25  var session = _sessions.Get(token);
+ok   26–27 SessionStore.cs:18  public UserSession? Get(string? token) =>
+ok   28    SessionAuthMiddleware.cs:36  await _next(context);
+ok   28    InvoicesController.cs:22  [HttpGet]
+ok   29    InvoicesController.cs:25  var invoices = _repository.GetAll();
+ok   30    InMemoryInvoiceRepository.cs:20  public IReadOnlyList<Invoice> GetAll()
+ok   31    InvoicesController.cs:37  return Ok(invoices);
+ok   32    app.js:42  renderInvoices(invoices);
+ok   32    app.js:59  el('td', { class: `status status-${invoice.status}` }, invoice.status.replace(/(
+ok   32    app.js:64  function renderPending(pending) {
+ok   33    index.html:50  <table id="invoices-table">
+ok   33    index.html:65  <section id="approvals-panel" role="tabpanel" aria-labelledby="tab-approvals" hi
+107/107 agent citations resolve

@@ -25,7 +25,14 @@
 | 6 | AGENTS.md | 9/9 | 0/9 | 1/3 |
 | **4–6** | **AGENTS.md** | **27/27 = 100%** (95% CI 87.5–100%) | **0%** | **1/9 = 11.1%** (95% CI 2.0–43.5%) |
 
-Every defect was caught in all six runs. The only miss of any kind is a false alarm in run 6, on case-06 (see [scoring reliability](#scoring-reliability)). Leaving out case-09, the contested label, changes nothing: 24/24 caught in both conditions.
+Every defect was caught in all six runs. The only wrong verdict is a false alarm in run 6, on case-06 (see [scoring reliability](#scoring-reliability)). Leaving out case-09, the contested label, changes nothing: 24/24 caught in both conditions.
+
+The ten fixed cases on their own, the set every submission shares (8 defect, 2 clean):
+
+| Context file | Caught | False alarms |
+| --- | --- | --- |
+| none (runs 1–3) | 24/24 = 100% (95% CI 86.2–100%) | 0/6 = 0% (95% CI 0–39.0%) |
+| AGENTS.md (runs 4–6) | 24/24 = 100% (95% CI 86.2–100%) | 1/6 = 16.7% (95% CI 3.0–56.4%) |
 
 ## Was the change an improvement?
 
@@ -36,7 +43,7 @@ What the context file did change:
 - **Cost and time:** median per review $0.072 against $0.055 (+31%), and 24 s against 20 s.
 - **Repository-specific findings.** With AGENTS.md the reviewer added convention breaches the baseline could not know about: no tests for a new rule, `Handle(...)` bypassed, business logic in a controller.
   - On case-09 it caught a second true inaccuracy in all three runs: the demo accounts live in `appsettings.json`, not "the in-memory store".
-- **More confidence in an unverifiable claim.** On case-02 it rated "`_queries` probably does not exist, so this won't build" at medium-high, because AGENTS.md says there is no database. The baseline runs rated the same claim low. The diff cannot show whether `_queries` exists.
+- **More confidence in an unverifiable claim.** On case-02 it rated "`_queries` probably doesn't exist, so this won't build or won't work" at medium to medium-high, because AGENTS.md says there is no database. The baseline runs rated the same claim low. The diff cannot show whether `_queries` exists.
 
 My verdict: keep AGENTS.md for the repository-specific findings it adds, and accept that this eval cannot show it improves detection. If anything it made the reviewer slightly noisier.
 
@@ -66,7 +73,7 @@ A second scorer re-scored all 108 reviews (72 main plus 36 probe). It was a sepa
 
 - **Harder cases**, so strong models do not all score 100%: defects that need two files, or knowledge of the conventions, to see.
 - **As many clean cases as defect cases.** False alarms are what make people stop reading reviews, and 3 clean cases cannot measure them.
-- **Score noise as well as verdicts.** Count wrong findings per review on defect cases too.
+- **Score noise as well as verdicts.** The answer key promised a separate count of spurious findings on defect cases. I recorded extra findings in the `notes` column but did not classify every one as true or spurious, so that count is not reported here. The next round should classify them.
 - **Fix the fixtures.** 7 of the 10 original diffs (02, 03, 04, 06, 07, 08, 10) have hunk headers that do not match their bodies. The reviewer noticed this on case-06 in 3 of 6 runs. I verified it, and scored it as true, not a false alarm.
 - **Keep the eval cases away from agents that have repository access.** The ADR sparring agent read `case-11.diff` and cited it as production history (see ADR-001).
 

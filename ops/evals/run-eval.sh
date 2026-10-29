@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# Runs every eval case in its own fresh, isolated Claude Code session and keeps the raw result.
-# Usage: ops/evals/run-eval.sh <baseline|agents-md> <run>...  (MODEL, EFFORT, PARALLEL, RUN_LABEL override defaults)
-# agents-md adds the repo's CLAUDE.md -> AGENTS.md as the context file; nothing else differs.
-# File tools stay on but only reach an empty temp dir; without tools the model invents tool calls.
+# Usage: ops/evals/run-eval.sh <baseline|agents-md> <run>... (one fresh Claude Code session per case)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -36,6 +33,7 @@ review_case() {
 
   for attempt in 1 2 3; do
     workdir="$(mktemp -d)"
+    # The only difference between conditions: agents-md adds the repo's CLAUDE.md and AGENTS.md.
     if [[ "$condition" == "agents-md" ]]; then
       cp "$REPO/CLAUDE.md" "$REPO/AGENTS.md" "$workdir/"
     fi
@@ -43,6 +41,7 @@ review_case() {
     printf '%s\n\n%s\n' "$REVIEW_PROMPT" "$(cat "$case_file")" > "$workdir/.message"
     (
       cd "$workdir"
+      # Read tools only reach this empty dir; with no tools at all the model invents tool calls.
       env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT claude -p \
         --model "$MODEL" --effort "$EFFORT" \
         --tools "Read,Grep,Glob" --permission-prompts none \

@@ -15,26 +15,28 @@ sequenceDiagram
     MW->>Store: Get(token)
     alt missing or unknown token
         MW-->>UI: 401
+    else session found
+        MW->>Filter: continue, session in HttpContext.Items
+        alt role not Approver or Admin
+            Filter-->>UI: 403, unreachable with the two demo users
+        else role allowed
+            Filter->>Ctl: Approve(invoiceId)
+            Ctl->>Base: Handle(Approve(invoiceId, session.Username))
+            Base->>Svc: Approve(invoiceId, approver)
+            Svc->>Repo: GetById(invoiceId)
+            alt not found
+                Svc-->>Base: KeyNotFoundException
+                Base-->>UI: 404 with error
+            else not PendingApproval
+                Svc-->>Base: InvalidOperationException
+                Base-->>UI: 409 with error
+            else pending
+                Svc->>Svc: Status Approved, DecidedBy, DecidedAt UtcNow
+                Svc->>Repo: Update(invoice)
+                Base-->>UI: 200 with the invoice
+                UI->>MW: GET /api/invoices to refresh both tabs
+                Note over UI: the approve response is discarded, and the tables show status only, never DecidedBy or DecidedAt
+            end
+        end
     end
-    MW->>Filter: continue, session in HttpContext.Items
-    alt role not Approver or Admin
-        Filter-->>UI: 403, unreachable with the two demo users
-    end
-    Filter->>Ctl: Approve(invoiceId)
-    Ctl->>Base: Handle(Approve(invoiceId, session.Username))
-    Base->>Svc: Approve(invoiceId, approver)
-    Svc->>Repo: GetById(invoiceId)
-    alt not found
-        Svc-->>Base: KeyNotFoundException
-        Base-->>UI: 404 with error
-    else not PendingApproval
-        Svc-->>Base: InvalidOperationException
-        Base-->>UI: 409 with error
-    else pending
-        Svc->>Svc: Status Approved, DecidedBy, DecidedAt UtcNow
-        Svc->>Repo: Update(invoice)
-        Base-->>UI: 200 with the invoice
-        UI->>MW: GET /api/invoices to refresh both tabs
-        Note over UI: the approve response is discarded, and the tables show status only, never DecidedBy or DecidedAt
-    end
-    Note over UI: any error goes to #decision-error, including a failed refresh after a stored approval
+    Note over UI: any error goes to the decision-error alert, including a failed refresh after a stored approval

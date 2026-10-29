@@ -1,6 +1,6 @@
 # NAGP AI in SDLC: Home Assignment 2
 
-The Invoice Approval service goes tier-2 in January, with a 24x7 rotation, a published SLO and PayEx payments. This repository holds what I would want to own before that happens. Every number comes from a script or a cited file in this repository.
+The Invoice Approval service goes tier-2 in January, with a 24x7 rotation, a published SLO and PayEx payments. This repository holds what I would want to own before that happens. Every measured number comes from a script or a cited file in this repository; estimates are labelled as such.
 
 | # | Hand-in item | Where |
 | --- | --- | --- |
@@ -19,7 +19,8 @@ The Invoice Approval service goes tier-2 in January, with a 24x7 rotation, a pub
 ```
 dotnet test backend/InvoiceApp.sln                                   # 8 tests, including the architecture rule
 dotnet test backend/InvoiceApp.sln --filter "Category=Architecture"  # the architecture rule on its own
-python3 docs/architecture/check_citations.py                         # every diagram citation resolves
+python3 docs/architecture/check_citations.py                         # every as-built citation resolves
+python3 docs/architecture/check_agent_citations.py                   # every citation in the agent's draft resolves
 python3 docs/metrics/compute_baseline.py                             # baseline numbers
 python3 ops/evals/summarize.py                                       # eval rates and intervals
 ```

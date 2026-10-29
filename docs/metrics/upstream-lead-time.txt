@@ -1,0 +1,6 @@
+# Upstream lead-time data point (2026-10-29T19:09Z): commit 0616158 authored -> CI green on main
+$ gh api repos/NITIN1670/ai-in-sdlc-assignment/commits/0616158 --jq '[.sha, .commit.author.date] | @tsv'
+0616158bdd735dfdf87c88ae381a26902dacfdfe	2026-10-12T10:20:35Z
+$ gh api 'repos/NITIN1670/ai-in-sdlc-assignment/actions/runs?branch=main&head_sha=0616158bdd735dfdf87c88ae381a26902dacfdfe' --jq '.workflow_runs[] | [.id, .event, .conclusion, .run_started_at, .updated_at] | @tsv'
+38544149767	push	success	2026-10-14T09:41:04Z	2026-10-14T09:41:35Z
+lead time (authored -> CI green): 47.4 h

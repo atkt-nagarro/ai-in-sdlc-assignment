@@ -42,7 +42,7 @@ one-line change compiles cleanly and only this test notices.
 Captured in [`architecture-test-run.txt`](architecture-test-run.txt):
 
 1. As committed: 1 passed. The only reference Domain has today is
-   `System.Runtime, Version=8.0.0.0`.
+   `System.Runtime, Version=8.0.0.0` (section 4 of the capture).
 2. With `private static readonly HttpClient PayEx = new();` added to
    `ApprovalService`, the build still succeeds and the test fails with
    `InvoiceApp.Domain must not depend on web, HTTP, storage or application

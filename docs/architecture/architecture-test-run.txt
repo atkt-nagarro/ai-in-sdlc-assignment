@@ -19,3 +19,7 @@ $ dotnet test backend/InvoiceApp.sln --filter "Category=Architecture"
 Passed!  - Failed:     0, Passed:     1, Skipped:     0, Total:     1, Duration: 1 ms - InvoiceApp.Tests.dll (net8.0)
 $ dotnet test backend/InvoiceApp.sln
 Passed!  - Failed:     0, Passed:     8, Skipped:     0, Total:     8, Duration: 3 ms - InvoiceApp.Tests.dll (net8.0)
+
+## 4. What the Domain assembly references today
+$ dotnet fsi refs.fsx backend/src/InvoiceApp.Domain/bin/Debug/net8.0/InvoiceApp.Domain.dll   (prints GetReferencedAssemblies())
+System.Runtime, Version=8.0.0.0

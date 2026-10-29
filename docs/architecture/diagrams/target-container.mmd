@@ -5,7 +5,8 @@ flowchart LR
     subgraph appsvc["Azure App Service, 3 instances (planned hosting)"]
         ui["Static web UI (exists)"]
         api["InvoiceApp.Api controllers (exists)"]
-        domain["ApprovalService (exists)<br/>plus second approver over $1,000 (planned, UC-1)"]
+        domain["ApprovalService (exists, changes planned)<br/>second approver over $1,000 (UC-1),<br/>outbox row on final approval"]
+        sqlrepo["SqlInvoiceRepository + unit of work (planned)<br/>replaces InMemoryInvoiceRepository"]
         dispatcher["PayEx dispatcher<br/>BackgroundService (planned)"]
         recon["Daily reconciliation<br/>read-only (planned)"]
     end
@@ -14,14 +15,15 @@ flowchart LR
     sessions[("Shared session store (planned)<br/>SessionStore is in memory today")]
     kv["Key Vault: PayEx key (planned)"]
     insights["Application Insights alerts (planned)<br/>oldest unpaid approval, Unknown, heartbeat"]
-    sb["Service Bus topic (provisioned, unused)<br/>notifications only, later"]
+    sb["Service Bus topic (provisioned in Azure)<br/>notifications only, never payments"]
     payex["PayEx API (external)"]
 
     user --> ui
     user --> api
     api --> domain
     api --> sessions
-    domain -->|"one transaction: invoice, audit, outbox row"| sql
+    domain -->|"IInvoiceRepository"| sqlrepo
+    sqlrepo -->|"one transaction: invoice, audit, outbox row"| sql
     dispatcher -->|"claim due rows with a lease"| sql
     dispatcher -->|"POST payment, idempotency key"| payex
     dispatcher -->|"API key"| kv
@@ -33,7 +35,11 @@ flowchart LR
 
     classDef planned stroke-dasharray: 6 4,fill:#fff7e6,stroke:#b7791f,color:#16202a
     classDef exists fill:#e6f4f1,stroke:#0f766e,color:#16202a
+    classDef changing fill:#e6f4f1,stroke:#b7791f,stroke-width:3px,color:#16202a
+    classDef provisioned fill:#eef1f5,stroke:#4f5b67,stroke-dasharray: 2 2,color:#16202a
     classDef external fill:#eef1f5,stroke:#4f5b67,color:#16202a
-    class dispatcher,recon,sql,sessions,kv,insights,sb planned
-    class ui,api,domain exists
+    class dispatcher,recon,sql,sessions,kv,insights,sqlrepo planned
+    class ui,api exists
+    class domain changing
+    class sb provisioned
     class payex external

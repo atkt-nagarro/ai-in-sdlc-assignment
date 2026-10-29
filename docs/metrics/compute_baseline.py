@@ -155,7 +155,7 @@ def main():
     print()
 
     print("3. REVIEW TURNAROUND: not capturable today")
-    print("   no pull request or review events exist in the repo or the CI export; query in measurement-plan.md")
+    print("   the CI export has PR runs but no review or approval timestamps; query in measurement-plan.md")
 
 
 if __name__ == "__main__":

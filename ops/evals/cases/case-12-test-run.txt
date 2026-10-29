@@ -1,0 +1,10 @@
+# case-12 applied to the real ApprovalService.cs, full test suite run, then reverted (2026-10-29T19:09Z)
+$ git apply ops/evals/cases/case-12.diff
+applied
+$ git diff --stat -- backend/src/InvoiceApp.Domain/ApprovalService.cs
+ backend/src/InvoiceApp.Domain/ApprovalService.cs | 26 ++++++++++++------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
+$ dotnet test backend/InvoiceApp.sln
+Passed!  - Failed:     0, Passed:     8, Skipped:     0, Total:     8, Duration: 3 ms - InvoiceApp.Tests.dll (net8.0)
+$ git checkout -- backend/src/InvoiceApp.Domain/ApprovalService.cs
+reverted

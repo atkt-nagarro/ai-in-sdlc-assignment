@@ -16,13 +16,14 @@ python3 docs/metrics/compute_baseline.py
 | CI time inside that | Median 31.3 min, p90 34.5 min | same | Static analysis alone is 8.0 min |
 | **Change failure rate** | **2/5 = 40%** (Wilson 95% 12–77%). 29% if 2.14.1 and 2.14.2 also shipped cleanly. | Releases in `INC-2041/README.md` and `INC-2047/recent-changes.md`; failures INC-2041 (2.14.0) and INC-2047 (2.15.1) | Tiny sample. The release list is rebuilt from incident packs. |
 | Not change failure rate | CI failed on 2/12 PR runs and 0/8 pushes to main | `run-timings.csv` | These failures were caught before production, so they don't count |
-| Review turnaround | **Not capturable** | n/a | There are no pull request or review events in the repository or the CI export |
+| Review turnaround | **Not capturable** | n/a | The CI export has PR-triggered runs but no review, approval or ready-for-review timestamps, and the upstream repository has no pull requests |
 
-The upstream repository adds one data point. Commit `0616158` was authored at 2026-10-12T10:20:35Z, and CI went green on main at 2026-10-14T09:41:35Z: **47.4 h**, n=1. It came from:
+The upstream repository adds one data point. Commit `0616158` was authored at 2026-10-12T10:20:35Z, and CI went green on main at 2026-10-14T09:41:35Z: **47.4 h**, n=1. The commands and their output are saved in [`upstream-lead-time.txt`](upstream-lead-time.txt):
 
 ```
-gh api repos/NITIN1670/ai-in-sdlc-assignment/commits --jq '.[0].commit.author.date'
-gh api repos/NITIN1670/ai-in-sdlc-assignment/actions/runs --jq '.workflow_runs[0].updated_at'
+gh api repos/NITIN1670/ai-in-sdlc-assignment/commits/0616158 --jq '[.sha, .commit.author.date] | @tsv'
+gh api 'repos/NITIN1670/ai-in-sdlc-assignment/actions/runs?branch=main&head_sha=0616158bdd735dfdf87c88ae381a26902dacfdfe' \
+  --jq '.workflow_runs[] | [.id, .event, .conclusion, .run_started_at, .updated_at] | @tsv'
 ```
 
 ## The live baseline: definition, source and query
@@ -56,6 +57,18 @@ A change's lead time is the first deploy whose SHA contains its merge commit (`g
 **Definition (DORA):** production deployments that needed remediation (a rollback, a hotfix, or a Sev 1–2 incident linked to the release), divided by all production deployments in the period.
 
 **Source:** the deployment list above, joined to incidents on a new mandatory **"caused by release"** field in the incident template. Today that link can only be inferred from timing.
+
+If incidents are GitHub issues labelled `incident`, with the release in the body:
+```
+gh issue list --repo <org>/invoice-approval --label incident --state all --limit 200 \
+  --json number,createdAt,title,body --jq '.[] | [.number, .createdAt, .title] | @tsv'
+```
+A deployment counts as **failed** when any of these hold:
+- an incident names its release
+- the next production deployment rolls it back, i.e. deploys a SHA that is an ancestor of it (`git merge-base --is-ancestor <new> <old>`)
+- a `hotfix/*` branch is deployed within 7 days
+
+CFR = failed deployments ÷ all production deployments, weekly and rolling 90 days.
 
 ### 3. Review turnaround
 

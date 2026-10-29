@@ -27,4 +27,4 @@ source: ops/pipeline/run-timings.csv (20 runs, 2026-01-19 to 2026-02-02)
      run 14 fix/approval-audit: failed at 'End-to-end tests'
 
 3. REVIEW TURNAROUND: not capturable today
-   no pull request or review events exist in the repo or the CI export; query in measurement-plan.md
+   the CI export has PR runs but no review or approval timestamps; query in measurement-plan.md

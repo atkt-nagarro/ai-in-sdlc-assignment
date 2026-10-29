@@ -1,4 +1,4 @@
-"""Checks every citation row in as-built.md: the file exists and the symbol sits at the cited line."""
+"""Checks as-built.md citations: file exists, symbol within one line of the cited range."""
 
 import re
 import sys

@@ -6,6 +6,7 @@ sequenceDiagram
         participant Svc as ApprovalService
     end
     box rgb(255,247,230) Planned, not built yet
+        participant Repo as SqlInvoiceRepository
         participant DB as Azure SQL
         participant W as PayEx dispatcher
         participant R as Daily reconciliation
@@ -13,12 +14,16 @@ sequenceDiagram
     participant P as PayEx (external)
 
     Approver->>API: POST /api/approvals/{id}/approve
-    API->>Svc: Approve(id, approver)
-    Svc->>DB: one transaction: invoice to Approved only if still pending,<br/>ApprovalAudit row, PaymentSubmission row with key and payload
+    API->>Svc: Approve(id, approver) inside Handle
+    Svc->>Repo: approve if still pending, add audit row, add PaymentSubmission
+    Repo->>DB: one transaction: conditional UPDATE, INSERT audit, INSERT outbox row
     alt invoice no longer pending
-        DB-->>API: 0 rows updated
+        DB-->>Repo: 0 rows updated, roll back
+        Repo-->>Svc: not pending
+        Svc-->>API: InvalidOperationException
         API-->>Approver: 409
     else committed
+        Repo-->>Svc: saved
         API-->>Approver: 200, Approved, awaiting PayEx
     end
     loop every 2 s on each instance
@@ -32,7 +37,13 @@ sequenceDiagram
         W->>DB: Rejected, routed to finance
     else timeout
         W->>DB: Unknown
-        W->>P: look up by key or reference before any retry
+        alt PayEx dedupes on the key
+            W->>P: retry with the same key and payload
+        else PayEx supports lookup by reference
+            W->>P: look up by our reference before any retry
+        else neither
+            W->>DB: manual queue, never resend blind
+        end
     else 401, 403, 429 or 5xx
         W->>W: open circuit, leave rows untouched, alert
     end

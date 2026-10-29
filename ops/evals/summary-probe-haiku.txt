@@ -6,6 +6,8 @@ claude-haiku-4-5-20251001 / context=none  (runs [1, 2, 3])
     run 2: caught 7/9, false alarms 0/3
     run 3: caught 6/9, false alarms 1/3
   caught without case-09     19/24 =  79.2%   95% CI 59.5% - 90.8%
+  fixed ten: caught          19/24 =  79.2%   95% CI 59.5% - 90.8%
+  fixed ten: false alarm      1/6  =  16.7%   95% CI  3.0% - 56.4%
   added cases 11-12: 3/6 scored correctly
   defect cases caught 3/3     6/9  =  66.7%   95% CI 35.4% - 87.9%
   per review: median 143 words, 11 s, $0.017; total $0.99

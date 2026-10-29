@@ -73,6 +73,11 @@ def summarise(rows, title):
               f"false alarms {sum(r['verdict'] == 'false_alarm' for r in run_clean)}/{len(run_clean)}")
     without = [r for r in defect_rows if r["case"] != CONTESTED_CASE]
     print(rate_line(f"caught without {CONTESTED_CASE}", sum(r["verdict"] == "caught" for r in without), len(without)))
+    fixed = [r for r in rows if r["case"] not in ADDED_CASES]
+    fixed_defects = [r for r in fixed if r["verdict"] in DEFECT_VERDICTS]
+    fixed_clean = [r for r in fixed if r["verdict"] in CLEAN_VERDICTS]
+    print(rate_line("fixed ten: caught", sum(r["verdict"] == "caught" for r in fixed_defects), len(fixed_defects)))
+    print(rate_line("fixed ten: false alarm", sum(r["verdict"] == "false_alarm" for r in fixed_clean), len(fixed_clean)))
     added = [r for r in rows if r["case"] in ADDED_CASES]
     print(f"  added cases 11-12: {sum(r['verdict'] in ('caught', 'clean') for r in added)}/{len(added)} scored correctly")
     defect_cases = sorted({r["case"] for r in defect_rows})

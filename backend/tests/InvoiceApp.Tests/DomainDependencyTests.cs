@@ -3,7 +3,7 @@ using Xunit;
 
 namespace InvoiceApp.Tests;
 
-/// <summary>AGENTS.md rule: Domain references only the base class library, nothing web, HTTP or storage.</summary>
+/// <summary>Domain stays on the base class library: no web, HTTP or storage code.</summary>
 public class DomainDependencyTests
 {
     private static readonly string[] ForbiddenBaseLibraryAreas = { "System.Net", "System.Data" };

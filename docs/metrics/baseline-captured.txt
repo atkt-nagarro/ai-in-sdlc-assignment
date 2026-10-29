@@ -1,0 +1,30 @@
+BASELINE CAPTURED FROM THE REPOSITORY AND ITS CI HISTORY
+source: ops/pipeline/run-timings.csv (20 runs, 2026-01-19 to 2026-02-02)
+
+1. LEAD TIME FOR CHANGES (proxy: first PR CI run -> merged-to-main CI run finished)
+   feature/supplier-contacts   PR runs [1]               -> main run  4   70.8 h
+   fix/notification-filter     PR runs [2, 3, 5, 6, 7]   -> main run  8   99.9 h
+   fix/notification-filter     PR runs [18]              -> main run 19    5.5 h
+   chore/dependency-bumps      PR runs [10, 11]          -> main run 12   48.3 h
+   fix/approval-audit          PR runs [14, 17]          -> main run 19   67.5 h
+   feature/payex-retry         PR runs [15]              -> main run 16   26.9 h
+   primary (split branches reused after a merge): median 57.9 h, range 5.5-99.9 h, n=6
+   sensitivity (one change per branch):           median 67.5 h, range 26.9-291.9 h, n=5
+   main pushes with no PR run in the window: [9, 13, 20]
+   CI time per run: median 31.3 min, p90 34.5 min, range 28.4-35.1 min
+   slowest steps (median): Static analysis 8.0 min, End-to-end tests 3.7 min, Build container image 2.7 min
+
+2. CHANGE FAILURE RATE (production releases followed by an incident)
+   2.13.4  about 2026-01-05  ok      INC-2041/README.md: running nine days without incident
+   2.14.0  2026-01-14        FAILED  INC-2041: 5xx alert 14 minutes after the 09:58Z deploy
+   2.14.3  2026-01-16        ok      INC-2047/recent-changes.md: no incident recorded
+   2.15.0  2026-01-21        ok      INC-2047/recent-changes.md: no incident recorded
+   2.15.1  2026-01-28        FAILED  INC-2047: notifications stopped after the 08:41Z deploy
+   known releases: 2/5 = 40% (Wilson 95% 12%-77%)
+   if 2.14.1 and 2.14.2 also shipped cleanly: 2/7 = 29%
+   not CFR (caught before production): CI failed on 2/12 PR runs, 0/8 main pushes
+     run 6 fix/notification-filter: failed at 'Container image scan'
+     run 14 fix/approval-audit: failed at 'End-to-end tests'
+
+3. REVIEW TURNAROUND: not capturable today
+   no pull request or review events exist in the repo or the CI export; query in measurement-plan.md

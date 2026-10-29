@@ -1,21 +1,8 @@
 #!/usr/bin/env bash
-# Runs the review eval: every case in its own fresh, isolated Claude Code session.
-#
-#   ops/evals/run-eval.sh <condition> <run-number> [<run-number> ...]
-#   MODEL=<id> RUN_LABEL=<folder> overrides the model and the output folder name.
-#
-# Conditions
-#   baseline   the agent gets the review prompt and the diff, nothing else
-#   agents-md  identical, except the repository's CLAUDE.md (which imports AGENTS.md)
-#              is present as the project context file
-#
-# Each case runs in a new empty temporary directory with no MCP servers and no session
-# persistence, so nothing carries over between cases or runs. The agent keeps its read-only
-# file tools, but they only reach that empty directory: any read outside it needs a
-# permission prompt, and --permission-prompts none denies those (denials are recorded in
-# the result). Without tools the model writes imaginary tool calls into its answer. Results go to
-# ops/evals/runs/<condition>/run-<n>/<case>.json (raw) and .md (the review text).
-# Existing results are kept, so an interrupted run can simply be started again.
+# Runs every eval case in its own fresh, isolated Claude Code session and keeps the raw result.
+# Usage: ops/evals/run-eval.sh <baseline|agents-md> <run>...  (MODEL, EFFORT, PARALLEL, RUN_LABEL override defaults)
+# agents-md adds the repo's CLAUDE.md -> AGENTS.md as the context file; nothing else differs.
+# File tools stay on but only reach an empty temp dir; without tools the model invents tool calls.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"

@@ -3,10 +3,7 @@ using Xunit;
 
 namespace InvoiceApp.Tests;
 
-/// <summary>
-/// Structural rule from AGENTS.md: the Domain project holds business rules, no web or storage code.
-/// It may reference the base class library only, and not the parts of it that reach networks or databases.
-/// </summary>
+/// <summary>AGENTS.md rule: Domain references only the base class library, nothing web, HTTP or storage.</summary>
 public class DomainDependencyTests
 {
     private static readonly string[] ForbiddenBaseLibraryAreas = { "System.Net", "System.Data" };

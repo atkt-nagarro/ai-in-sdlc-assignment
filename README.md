@@ -11,7 +11,7 @@ The Invoice Approval service goes tier-2 in January, with a 24x7 rotation, a pub
 | 5 | The two added evaluation cases, and results for three runs plus the changed-variable run | [case-11](ops/evals/cases/case-11.diff), [case-12](ops/evals/cases/case-12.diff), [RESULTS.md](ops/evals/RESULTS.md), [results.csv](ops/evals/results.csv) |
 | 6 | The risk audit, with a decision recorded | [lethal-trifecta-audit.md](docs/security/lethal-trifecta-audit.md) |
 | 7 | The measurement plan, with the two numbers captured | [measurement-plan.md](docs/metrics/measurement-plan.md) |
-| 8 | The 8 to 10 minute demo video | _link to be added after upload_ (script: [demo-script.md](docs/demo/demo-script.md)) |
+| 8 | The 8 to 10 minute demo video | [demo.mp4](docs/demo/demo.mp4), 8 min 41 s (narration: [narration-script.md](docs/demo/narration-script.md); plan: [demo-script.md](docs/demo/demo-script.md)) |
 | 9 | AI augmentation logs | [ai-augmentation-log.md](docs/ai-augmentation-log.md), raw sessions in [docs/agent-sessions/](docs/agent-sessions/) and [ops/evals/runs/](ops/evals/runs/) |
 
 ## Check it yourself

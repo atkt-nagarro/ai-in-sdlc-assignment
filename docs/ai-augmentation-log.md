@@ -10,6 +10,8 @@ The assignment asks for agent output, and evidence of how it was used. This page
 | `claude-opus-5-5` | through the corporate gateway | Diagram draft, ADR sparring, the review eval, blind second scoring |
 | `claude-haiku-4-5-20251001` | through the corporate gateway | Eval sensitivity probe only |
 | Mermaid MCP (`mcp-mermaid`) | 0.4.1, local `svg` output (local PNG previews only for my visual checks) | Drawing, validating and rendering the diagrams |
+| Playwright | 1.64.1, headless Chromium | Recording the demo video |
+| macOS `say` | voice Daniel (English, UK) | Synthesised narration for the demo video |
 
 I also used Claude Code as a working assistant throughout: reading the codebase and the incident packs, drafting these documents from my decisions, writing the scripts, and checking numbers. That session is not exported; it stayed in my local Claude Code history. Two rules held for everything published here. Every measured number comes from a script in this repository or a cited file, and estimates are labelled as such. Every agent claim I relied on was checked against the evidence; the checks are described per task below.
 
@@ -25,6 +27,7 @@ I also used Claude Code as a working assistant throughout: reading the codebase 
 | 4. Review eval | 72 isolated reviewer sessions (3 runs × 12 cases × 2 conditions), plus 36 probe sessions | [ops/evals/runs/](../ops/evals/runs/) | All outputs scored | Scored strictly against a key committed before the first run (`9e8defb`) | A blind second scorer (a separate Claude Code agent, same key, told not to open my scores) re-scored all 108 reviews: 107/108 agree, Cohen's kappa 0.98. I adopted its call on the one disagreement. Its prompt and a summary of what it opened are in [03-second-scorer](agent-sessions/03-second-scorer/), and its verdicts in [second-scorer.json](../ops/evals/second-scorer.json). |
 | 5. Trifecta audit | Checked the Claude Code settings keys against the current docs | working-assistant session, not exported | `permissions`, `defaultMode: dontAsk`, `sandbox.network.allowedDomains` with `strictAllowlist`, `disabledMcpjsonServers`, `blockReadsOutsideWorkingDirectories` | The final review found that `allowedDomains` alone only pre-approves hosts. I added `strictAllowlist` and `dontAsk` after confirming the behaviour in the sandboxing docs | Profile JSON validated; evidence lines in the audit checked one by one |
 | 5. Measurement plan | Wrote and ran the baseline script; checked the `az` and `gh` commands | [baseline-captured.txt](metrics/baseline-captured.txt) | Numbers as computed | Added 2.13.4 to the release list after rereading INC-2041 (CFR 2/5, not 2/4) | `compute_baseline.py` output matches the plan; `az` commands checked with `--help` |
+| 8. Demo video | Produced the whole video. A scripted Playwright recording of the rendered deliverables and the running app, with the tests run live, narration synthesised with macOS `say` from my demo script, and captions on screen | [narration-script.md](demo/narration-script.md) | The video as recorded, 8 min 41 s | Nothing was staged: the app, the git changes and the test results in the video are real | Frames checked against the narration; the end card says how the video was made |
 
 ## Cost of the agent sessions
 
@@ -36,6 +39,7 @@ I also used Claude Code as a working assistant throughout: reading the codebase 
 | ADR sparring (four turns) | 1 | $1.00 |
 | Mermaid MCP diagram draft | 1 | $0.65, plus $0.78 for a discarded first run |
 | Blind second scoring | 1 | not reported by the subagent tool (about 183k tokens) |
+| Demo video | 1 | no API cost: local speech synthesis and a local browser |
 
 ## Where the agent was wrong, across tasks
 

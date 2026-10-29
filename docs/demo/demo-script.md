@@ -1,5 +1,7 @@
 # Demo video script (about 9 minutes 40; the brief allows 8 to 10)
 
+The recorded video, [demo.mp4](demo.mp4) (8 min 41 s), follows this plan. Its exact narration is in [narration-script.md](narration-script.md).
+
 Record with Teams (Meeting, Share screen, Record) or QuickTime (File, New Screen Recording), then export MP4. Upload to OneDrive or SharePoint with "anyone in the organisation can view", and paste the link into the README index.
 
 **Before you start:**

@@ -1,0 +1,40 @@
+claude-opus-5-5 / context=AGENTS.md  (runs [4, 5, 6])
+  caught                     27/27 = 100.0%   95% CI 87.5% - 100.0%
+  missed                      0/27 =   0.0%   95% CI  0.0% - 12.5%
+  false alarm                 0/9  =   0.0%   95% CI  0.0% - 29.9%
+    run 4: caught 9/9, false alarms 0/3
+    run 5: caught 9/9, false alarms 0/3
+    run 6: caught 9/9, false alarms 0/3
+  caught without case-09     24/24 = 100.0%   95% CI 86.2% - 100.0%
+  added cases 11-12: 6/6 scored correctly
+  defect cases caught 3/3     9/9  = 100.0%   95% CI 70.1% - 100.0%
+  per review: median 457 words, 24 s, $0.072; total $2.60
+
+claude-opus-5-5 / context=none  (runs [1, 2, 3])
+  caught                     27/27 = 100.0%   95% CI 87.5% - 100.0%
+  missed                      0/27 =   0.0%   95% CI  0.0% - 12.5%
+  false alarm                 0/9  =   0.0%   95% CI  0.0% - 29.9%
+    run 1: caught 9/9, false alarms 0/3
+    run 2: caught 9/9, false alarms 0/3
+    run 3: caught 9/9, false alarms 0/3
+  caught without case-09     24/24 = 100.0%   95% CI 86.2% - 100.0%
+  added cases 11-12: 6/6 scored correctly
+  defect cases caught 3/3     9/9  = 100.0%   95% CI 70.1% - 100.0%
+  per review: median 422 words, 20 s, $0.055; total $2.01
+
+per-case grid (C caught, M missed, ok clean, FA false alarm)
+  case     r1   r2   r3   r4   r5   r6  
+  case-01  C    C    C    C    C    C   
+  case-02  C    C    C    C    C    C   
+  case-03  C    C    C    C    C    C   
+  case-04  ok   ok   ok   ok   ok   ok  
+  case-05  C    C    C    C    C    C   
+  case-06  ok   ok   ok   ok   ok   ok  
+  case-07  C    C    C    C    C    C   
+  case-08  C    C    C    C    C    C   
+  case-09  C    C    C    C    C    C   
+  case-10  C    C    C    C    C    C   
+  case-11  C    C    C    C    C    C   
+  case-12  ok   ok   ok   ok   ok   ok  
+
+paired by case: 'claude-opus-5-5 / context=none' better on 0 cases, worse on 0, tied on 12; exact sign test p = 1.00

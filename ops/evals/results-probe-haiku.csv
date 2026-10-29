@@ -1,0 +1,37 @@
+run,case,model,prompt_version,verdict,finding_summary,confidence_reported,notes,context_file
+1,case-01,claude-haiku-4-5-20251001,v1,caught,Null Ids dereferenced in the loop (run 3 also: no per-item result on failure),,,none
+1,case-02,claude-haiku-4-5-20251001,v1,caught,SQL injection through customer and status,,,none
+1,case-03,claude-haiku-4-5-20251001,v1,missed,Says ToZero only changes ties (2.5 -> 2); misses that it truncates every amount,,"Right conclusion for the wrong reason, so missed under the strict rule",none
+1,case-04,claude-haiku-4-5-20251001,v1,clean,No defects,,,none
+1,case-05,claude-haiku-4-5-20251001,v1,caught,Delete has no authorisation attribute; Update below requires Admin,,,none
+1,case-06,claude-haiku-4-5-20251001,v1,clean,No defects,,,none
+1,case-07,claude-haiku-4-5-20251001,v1,caught,Full invoice and current-user objects logged with structured destructuring,,,none
+1,case-08,claude-haiku-4-5-20251001,v1,caught,Dictionary not thread-safe; check-then-act race in Add,,,none
+1,case-09,claude-haiku-4-5-20251001,v1,missed,No defects; calls the README reset instruction 'accurate',,,none
+1,case-10,claude-haiku-4-5-20251001,v1,caught,Catch-all returns 200 for any exception and swallows it,,,none
+1,case-11,claude-haiku-4-5-20251001,v1,missed,Only flags ambiguous wording in the retry log message,,Never mentions duplicate payment or idempotency,none
+1,case-12,claude-haiku-4-5-20251001,v1,clean,No defects,,,none
+2,case-01,claude-haiku-4-5-20251001,v1,caught,Null Ids dereferenced in the loop (run 3 also: no per-item result on failure),,,none
+2,case-02,claude-haiku-4-5-20251001,v1,caught,SQL injection through customer and status,,,none
+2,case-03,claude-haiku-4-5-20251001,v1,caught,"ToZero truncates toward zero, so customers get different discount amounts",,,none
+2,case-04,claude-haiku-4-5-20251001,v1,clean,No defects,,,none
+2,case-05,claude-haiku-4-5-20251001,v1,caught,Delete has no authorisation attribute; Update below requires Admin,,,none
+2,case-06,claude-haiku-4-5-20251001,v1,clean,No defects,,,none
+2,case-07,claude-haiku-4-5-20251001,v1,caught,Full invoice and current-user objects logged with structured destructuring,,,none
+2,case-08,claude-haiku-4-5-20251001,v1,caught,Dictionary not thread-safe; check-then-act race in Add,,,none
+2,case-09,claude-haiku-4-5-20251001,v1,missed,No defects; calls the README reset instruction 'accurate',,,none
+2,case-10,claude-haiku-4-5-20251001,v1,caught,Catch-all returns 200 for any exception and swallows it,,,none
+2,case-11,claude-haiku-4-5-20251001,v1,missed,No functional defects; retry logic 'sound',,,none
+2,case-12,claude-haiku-4-5-20251001,v1,clean,No defects,,,none
+3,case-01,claude-haiku-4-5-20251001,v1,caught,Null Ids dereferenced in the loop (run 3 also: no per-item result on failure),,,none
+3,case-02,claude-haiku-4-5-20251001,v1,caught,SQL injection through customer and status,,,none
+3,case-03,claude-haiku-4-5-20251001,v1,missed,Says the modes differ only on .5 boundaries and 'edge cases'; truncation not identified,,"Right conclusion for the wrong reason, so missed under the strict rule",none
+3,case-04,claude-haiku-4-5-20251001,v1,clean,No defects,,,none
+3,case-05,claude-haiku-4-5-20251001,v1,caught,Delete has no authorisation attribute; Update below requires Admin,,,none
+3,case-06,claude-haiku-4-5-20251001,v1,false_alarm,Claims a race condition in the InRange timing assertion,,"False alarm: InRange(before, UtcNow) evaluates UtcNow after Approve returns; no race",none
+3,case-07,claude-haiku-4-5-20251001,v1,caught,Full invoice and current-user objects logged with structured destructuring,,,none
+3,case-08,claude-haiku-4-5-20251001,v1,caught,Dictionary not thread-safe; check-then-act race in Add,,,none
+3,case-09,claude-haiku-4-5-20251001,v1,missed,No defects; calls the README reset instruction 'accurate',,,none
+3,case-10,claude-haiku-4-5-20251001,v1,caught,Catch-all returns 200 for any exception and swallows it,,,none
+3,case-11,claude-haiku-4-5-20251001,v1,missed,No definitive defects; retry logic 'correctly implemented',,,none
+3,case-12,claude-haiku-4-5-20251001,v1,clean,No defects,,,none

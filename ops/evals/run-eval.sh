@@ -2,6 +2,7 @@
 # Runs the review eval: every case in its own fresh, isolated Claude Code session.
 #
 #   ops/evals/run-eval.sh <condition> <run-number> [<run-number> ...]
+#   MODEL=<id> RUN_LABEL=<folder> overrides the model and the output folder name.
 #
 # Conditions
 #   baseline   the agent gets the review prompt and the diff, nothing else
@@ -32,12 +33,13 @@ shift
 [[ "$condition" == "baseline" || "$condition" == "agents-md" ]] || { echo "unknown condition: $condition" >&2; exit 2; }
 [[ $# -gt 0 ]] || { echo "give at least one run number" >&2; exit 2; }
 export condition HERE REPO
+export RUN_LABEL="${RUN_LABEL:-$condition}"
 
 review_case() {
   local run="$1" case_file="$2"
   local case_id out_dir workdir attempt
   case_id="$(basename "$case_file" .diff)"
-  out_dir="$HERE/runs/$condition/run-$run"
+  out_dir="$HERE/runs/$RUN_LABEL/run-$run"
   mkdir -p "$out_dir"
 
   if python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if not d.get("is_error") and d.get("result") else 1)' "$out_dir/$case_id.json" 2>/dev/null; then
@@ -95,7 +97,7 @@ export -f review_case
 mkdir -p "$HERE/runs"
 {
   echo "started: $(date -u +%FT%TZ)"
-  echo "condition: $condition  runs: $*  model: $MODEL  effort: $EFFORT"
+  echo "condition: $condition  label: $RUN_LABEL  runs: $*  model: $MODEL  effort: $EFFORT"
   echo "claude: $(claude --version 2>/dev/null)"
 } >> "$HERE/runs/manifest.txt"
 

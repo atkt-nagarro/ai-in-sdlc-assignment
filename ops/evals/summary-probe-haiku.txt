@@ -1,0 +1,27 @@
+claude-haiku-4-5-20251001 / context=none  (runs [1, 2, 3])
+  caught                     19/27 =  70.4%   95% CI 51.5% - 84.1%
+  missed                      8/27 =  29.6%   95% CI 15.9% - 48.5%
+  false alarm                 1/9  =  11.1%   95% CI  2.0% - 43.5%
+    run 1: caught 6/9, false alarms 0/3
+    run 2: caught 7/9, false alarms 0/3
+    run 3: caught 6/9, false alarms 1/3
+  caught without case-09     19/24 =  79.2%   95% CI 59.5% - 90.8%
+  added cases 11-12: 3/6 scored correctly
+  defect cases caught 3/3     6/9  =  66.7%   95% CI 35.4% - 87.9%
+  per review: median 143 words, 11 s, $0.017; total $0.99
+
+per-case grid (C caught, M missed, ok clean, FA false alarm)
+  case     r1   r2   r3  
+  case-01  C    C    C   
+  case-02  C    C    C   
+  case-03  M    C    M   
+  case-04  ok   ok   ok  
+  case-05  C    C    C   
+  case-06  ok   ok   FA  
+  case-07  C    C    C   
+  case-08  C    C    C   
+  case-09  M    M    M   
+  case-10  C    C    C   
+  case-11  M    M    M   
+  case-12  ok   ok   ok  
+

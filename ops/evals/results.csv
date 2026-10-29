@@ -1,0 +1,73 @@
+run,case,model,prompt_version,verdict,finding_summary,confidence_reported,notes,context_file
+1,case-01,claude-opus-5-5,v1,caught,Null Ids crashes with 500; a failure mid-loop leaves earlier invoices approved and the caller cannot tell which,high (null Ids); medium-high (partial batch),,none
+1,case-02,claude-opus-5-5,v1,caught,SQL injection through customer and status interpolated into the query,high,,none
+1,case-03,claude-opus-5-5,v1,caught,"ToZero truncates the discount, so totals rise by up to 1 cent versus the old rounding",high that results change; medium that it is unintended,,none
+1,case-04,claude-opus-5-5,v1,clean,No defects; rename is consistent; leftover references or named arguments would fail the build,n/a,,none
+1,case-05,claude-opus-5-5,v1,caught,Delete has no RequireRole(Admin); any signed-in user can delete invoices,high,,none
+1,case-06,claude-opus-5-5,v1,clean,"No definite defects; listed risks that depend on unseen code (clock kind, exact exception types)",n/a,"Also noted the hunk header does not match its body (true: -58,3 +58,36), as a diff artefact not a code defect",none
+1,case-07,claude-opus-5-5,v1,caught,Whole session/current-user object and full invoice destructured into logs,high,,none
+1,case-08,claude-opus-5-5,v1,caught,Dictionary is not thread-safe in a shared repository; Add is a check-then-insert race,"high, assuming a singleton registration",,none
+1,case-09,claude-opus-5-5,v1,caught,"README reset instruction is wrong: sign-out clears the session, not the process-lifetime store",medium,,none
+1,case-10,claude-opus-5-5,v1,caught,"Catch-all returns 200 completed, so failures are reported as success and the exception is lost",high,,none
+1,case-11,claude-opus-5-5,v1,caught,Retrying the payment POST after a timeout without an idempotency key can pay twice,high that the retry is unsafe,,none
+1,case-12,claude-opus-5-5,v1,clean,No defects; refactor preserves validation order and leaves DecisionNote untouched on approve,n/a,,none
+2,case-01,claude-opus-5-5,v1,caught,Null Ids crashes with 500; a failure mid-loop leaves earlier invoices approved and the caller cannot tell which,high; medium-high,,none
+2,case-02,claude-opus-5-5,v1,caught,SQL injection through customer and status interpolated into the query,high,,none
+2,case-03,claude-opus-5-5,v1,caught,"ToZero truncates the discount, so totals rise by up to 1 cent versus the old rounding",high that results change; medium that it is unintended,,none
+2,case-04,claude-opus-5-5,v1,clean,No defects; rename is consistent; leftover references or named arguments would fail the build,n/a,,none
+2,case-05,claude-opus-5-5,v1,caught,Delete has no RequireRole(Admin); any signed-in user can delete invoices,high,,none
+2,case-06,claude-opus-5-5,v1,clean,"No definite defects; listed risks that depend on unseen code (clock kind, exact exception types)",n/a,"Also noted the hunk header mismatch (true), explicitly 'diff format, not code'",none
+2,case-07,claude-opus-5-5,v1,caught,Whole session/current-user object and full invoice destructured into logs,high,,none
+2,case-08,claude-opus-5-5,v1,caught,Dictionary is not thread-safe in a shared repository; Add is a check-then-insert race,"high, assuming a singleton registration",,none
+2,case-09,claude-opus-5-5,v1,caught,"README reset instruction is wrong: sign-out clears the session, not the process-lifetime store",medium-high,,none
+2,case-10,claude-opus-5-5,v1,caught,"Catch-all returns 200 completed, so failures are reported as success and the exception is lost",very high,,none
+2,case-11,claude-opus-5-5,v1,caught,Retrying the payment POST after a timeout without an idempotency key can pay twice,high that the retry is unsafe,,none
+2,case-12,claude-opus-5-5,v1,clean,No defects; refactor preserves validation order and leaves DecisionNote untouched on approve,n/a,,none
+3,case-01,claude-opus-5-5,v1,caught,Null Ids crashes with 500; a failure mid-loop leaves earlier invoices approved and the caller cannot tell which,high; medium-high,,none
+3,case-02,claude-opus-5-5,v1,caught,SQL injection through customer and status interpolated into the query,high,,none
+3,case-03,claude-opus-5-5,v1,caught,"ToZero truncates the discount, so totals rise by up to 1 cent versus the old rounding",high that results change; medium that it is unintended,,none
+3,case-04,claude-opus-5-5,v1,clean,No defects; rename is consistent; leftover references or named arguments would fail the build,n/a,,none
+3,case-05,claude-opus-5-5,v1,caught,Delete has no RequireRole(Admin); any signed-in user can delete invoices,high,,none
+3,case-06,claude-opus-5-5,v1,clean,"No definite defects; listed risks that depend on unseen code (clock kind, exact exception types)",n/a,,none
+3,case-07,claude-opus-5-5,v1,caught,Whole session/current-user object and full invoice destructured into logs,high,,none
+3,case-08,claude-opus-5-5,v1,caught,Dictionary is not thread-safe in a shared repository; Add is a check-then-insert race,"high, assuming a singleton registration",,none
+3,case-09,claude-opus-5-5,v1,caught,"README reset instruction is wrong: sign-out clears the session, not the process-lifetime store",medium-high,,none
+3,case-10,claude-opus-5-5,v1,caught,"Catch-all returns 200 completed, so failures are reported as success and the exception is lost",high,,none
+3,case-11,claude-opus-5-5,v1,caught,Retrying the payment POST after a timeout without an idempotency key can pay twice,high that it is a real risk; medium that it double-charges (depends on PayEx dedupe),,none
+3,case-12,claude-opus-5-5,v1,clean,No defects; refactor preserves validation order and leaves DecisionNote untouched on approve,n/a,,none
+4,case-01,claude-opus-5-5,v1,caught,Null Ids crashes with 500; a failure mid-loop leaves earlier invoices approved and the caller cannot tell which,high; high,"With AGENTS.md also flagged: errors bypass Handle(), bulk rule belongs in Domain, no tests",AGENTS.md
+4,case-02,claude-opus-5-5,v1,caught,SQL injection through customer and status interpolated into the query,high,"Raised '_queries probably does not exist, will not build' to medium-high citing AGENTS.md (baseline runs rated it low)",AGENTS.md
+4,case-03,claude-opus-5-5,v1,caught,"ToZero truncates the discount, so totals rise by up to 1 cent versus the old rounding",high that results change; medium that it is unintended,Also: no test changes for a money rule (AGENTS.md),AGENTS.md
+4,case-04,claude-opus-5-5,v1,clean,No defects; rename is consistent; leftover references or named arguments would fail the build,n/a,,AGENTS.md
+4,case-05,claude-opus-5-5,v1,caught,Delete has no RequireRole(Admin); any signed-in user can delete invoices,high,,AGENTS.md
+4,case-06,claude-opus-5-5,v1,clean,"No definite defects; listed risks that depend on unseen code (clock kind, exact exception types)",n/a,,AGENTS.md
+4,case-07,claude-opus-5-5,v1,caught,Whole session/current-user object and full invoice destructured into logs,high,,AGENTS.md
+4,case-08,claude-opus-5-5,v1,caught,Dictionary is not thread-safe in a shared repository; Add is a check-then-insert race,"high, assuming a singleton registration",,AGENTS.md
+4,case-09,claude-opus-5-5,v1,caught,"README reset instruction is wrong: sign-out clears the session, not the process-lifetime store",medium-high (about 75%),"Also: demo accounts are not in the in-memory store (low, about 35%); true, they are in appsettings.json",AGENTS.md
+4,case-10,claude-opus-5-5,v1,caught,"Catch-all returns 200 completed, so failures are reported as success and the exception is lost",high,Also: no tests (AGENTS.md),AGENTS.md
+4,case-11,claude-opus-5-5,v1,caught,Retrying the payment POST after a timeout without an idempotency key can pay twice,high that the duplicate can happen,,AGENTS.md
+4,case-12,claude-opus-5-5,v1,clean,No defects; refactor preserves validation order and leaves DecisionNote untouched on approve,n/a,,AGENTS.md
+5,case-01,claude-opus-5-5,v1,caught,Null Ids crashes with 500; a failure mid-loop leaves earlier invoices approved and the caller cannot tell which,high; high,"With AGENTS.md also flagged: errors bypass Handle(), bulk rule belongs in Domain, no tests",AGENTS.md
+5,case-02,claude-opus-5-5,v1,caught,SQL injection through customer and status interpolated into the query,high,Also: _queries / no database per AGENTS.md (medium); convention breach; no tests,AGENTS.md
+5,case-03,claude-opus-5-5,v1,caught,"ToZero truncates the discount, so totals rise by up to 1 cent versus the old rounding",high that results change; medium that it is unintended,Also: negative amounts round the other way (low-medium); cosmetic blank line,AGENTS.md
+5,case-04,claude-opus-5-5,v1,clean,No defects; rename is consistent; leftover references or named arguments would fail the build,n/a,,AGENTS.md
+5,case-05,claude-opus-5-5,v1,caught,Delete has no RequireRole(Admin); any signed-in user can delete invoices,high,,AGENTS.md
+5,case-06,claude-opus-5-5,v1,clean,"No definite defects; listed risks that depend on unseen code (clock kind, exact exception types)",n/a,,AGENTS.md
+5,case-07,claude-opus-5-5,v1,caught,Whole session/current-user object and full invoice destructured into logs,high,,AGENTS.md
+5,case-08,claude-opus-5-5,v1,caught,Dictionary is not thread-safe in a shared repository; Add is a check-then-insert race,"high, assuming a singleton registration",,AGENTS.md
+5,case-09,claude-opus-5-5,v1,caught,"README reset instruction is wrong: sign-out clears the session, not the process-lifetime store",medium,Also: demo accounts likely not in the in-memory store (low); true,AGENTS.md
+5,case-10,claude-opus-5-5,v1,caught,"Catch-all returns 200 completed, so failures are reported as success and the exception is lost",high,Also: no tests (AGENTS.md),AGENTS.md
+5,case-11,claude-opus-5-5,v1,caught,Retrying the payment POST after a timeout without an idempotency key can pay twice,high,Also: no tests (AGENTS.md),AGENTS.md
+5,case-12,claude-opus-5-5,v1,clean,No defects; refactor preserves validation order and leaves DecisionNote untouched on approve,n/a,,AGENTS.md
+6,case-01,claude-opus-5-5,v1,caught,Null Ids crashes with 500; a failure mid-loop leaves earlier invoices approved and the caller cannot tell which,high; high,"With AGENTS.md also flagged: errors bypass Handle(), bulk rule belongs in Domain, no tests",AGENTS.md
+6,case-02,claude-opus-5-5,v1,caught,SQL injection through customer and status interpolated into the query,high,Also: _queries / no database per AGENTS.md (medium-high it fails to compile); no tests,AGENTS.md
+6,case-03,claude-opus-5-5,v1,caught,"ToZero truncates the discount, so totals rise by up to 1 cent versus the old rounding",high that results change; medium that it is unintended,Also: no tests (AGENTS.md),AGENTS.md
+6,case-04,claude-opus-5-5,v1,clean,No defects; rename is consistent; leftover references or named arguments would fail the build,n/a,,AGENTS.md
+6,case-05,claude-opus-5-5,v1,caught,Delete has no RequireRole(Admin); any signed-in user can delete invoices,high,,AGENTS.md
+6,case-06,claude-opus-5-5,v1,clean,"No definite defects; listed risks that depend on unseen code (clock kind, exact exception types)",n/a,"Listed the hunk header mismatch as finding 1 (true for the fixture); not a code defect, so not a false alarm",AGENTS.md
+6,case-07,claude-opus-5-5,v1,caught,Whole session/current-user object and full invoice destructured into logs,high,,AGENTS.md
+6,case-08,claude-opus-5-5,v1,caught,Dictionary is not thread-safe in a shared repository; Add is a check-then-insert race,"high, assuming a singleton registration",,AGENTS.md
+6,case-09,claude-opus-5-5,v1,caught,"README reset instruction is wrong: sign-out clears the session, not the process-lifetime store",medium-high (about 80%),"Also: demo accounts likely not in the in-memory store (low, about 35%); true",AGENTS.md
+6,case-10,claude-opus-5-5,v1,caught,"Catch-all returns 200 completed, so failures are reported as success and the exception is lost",high,Also: no tests (AGENTS.md),AGENTS.md
+6,case-11,claude-opus-5-5,v1,caught,Retrying the payment POST after a timeout without an idempotency key can pay twice,high,,AGENTS.md
+6,case-12,claude-opus-5-5,v1,clean,No defects; refactor preserves validation order and leaves DecisionNote untouched on approve,n/a,,AGENTS.md

@@ -64,7 +64,7 @@ run,case,model,prompt_version,verdict,finding_summary,confidence_reported,notes,
 6,case-03,claude-opus-5-5,v1,caught,"ToZero truncates the discount, so totals rise by up to 1 cent versus the old rounding",high that results change; medium that it is unintended,Also: no tests (AGENTS.md),AGENTS.md
 6,case-04,claude-opus-5-5,v1,clean,No defects; rename is consistent; leftover references or named arguments would fail the build,n/a,,AGENTS.md
 6,case-05,claude-opus-5-5,v1,caught,Delete has no RequireRole(Admin); any signed-in user can delete invoices,high,,AGENTS.md
-6,case-06,claude-opus-5-5,v1,clean,"No definite defects; listed risks that depend on unseen code (clock kind, exact exception types)",n/a,"Listed the hunk header mismatch as finding 1 (true for the fixture); not a code defect, so not a false alarm",AGENTS.md
+6,case-06,claude-opus-5-5,v1,false_alarm,"No 'no defects' verdict; lists conditional test failures (InRange type, exact exception type) as findings",low to medium,Adjudicated after the blind second score: findings 2-3 assert failures that do not occur; finding 1 (hunk header mismatch) is true,AGENTS.md
 6,case-07,claude-opus-5-5,v1,caught,Whole session/current-user object and full invoice destructured into logs,high,,AGENTS.md
 6,case-08,claude-opus-5-5,v1,caught,Dictionary is not thread-safe in a shared repository; Add is a check-then-insert race,"high, assuming a singleton registration",,AGENTS.md
 6,case-09,claude-opus-5-5,v1,caught,"README reset instruction is wrong: sign-out clears the session, not the process-lifetime store",medium-high (about 80%),"Also: demo accounts likely not in the in-memory store (low, about 35%); true",AGENTS.md

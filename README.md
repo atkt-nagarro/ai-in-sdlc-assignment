@@ -1,4 +1,34 @@
-# Invoice Approval Demo App
+# NAGP AI in SDLC: Home Assignment 2
+
+The Invoice Approval service goes tier-2 in January, with a 24x7 rotation, a published SLO and PayEx payments. This repository holds what I would want to own before that happens. Every number comes from a script or a cited file in this repository.
+
+| # | Hand-in item | Where |
+| --- | --- | --- |
+| 1 | Mermaid source for the as-built and target diagrams, with the citation list and the inferred-items list | [as-built.md](docs/architecture/as-built.md), [target-state.md](docs/architecture/target-state.md), [diagrams/](docs/architecture/diagrams/) |
+| 2 | One architecture test, with the command that runs it | [DomainDependencyTests.cs](backend/tests/InvoiceApp.Tests/DomainDependencyTests.cs), [architecture-test.md](docs/architecture/architecture-test.md) |
+| 3 | The exactly-once decision record, including *Where the agent was wrong or useless* | [ADR-001](docs/adr/ADR-001-exactly-once-payex-submission.md) |
+| 4 | One-page autonomy policy, with the day-one level stated | [autonomy-policy-incident-summaries.md](docs/policy/autonomy-policy-incident-summaries.md) |
+| 5 | The two added evaluation cases, and results for three runs plus the changed-variable run | [case-11](ops/evals/cases/case-11.diff), [case-12](ops/evals/cases/case-12.diff), [RESULTS.md](ops/evals/RESULTS.md), [results.csv](ops/evals/results.csv) |
+| 6 | The risk audit, with a decision recorded | [lethal-trifecta-audit.md](docs/security/lethal-trifecta-audit.md) |
+| 7 | The measurement plan, with the two numbers captured | [measurement-plan.md](docs/metrics/measurement-plan.md) |
+| 8 | The 8 to 10 minute demo video | _link to be added after upload_ (script: [demo-script.md](docs/demo/demo-script.md)) |
+| 9 | AI augmentation logs | [ai-augmentation-log.md](docs/ai-augmentation-log.md), raw sessions in [docs/agent-sessions/](docs/agent-sessions/) and [ops/evals/runs/](ops/evals/runs/) |
+
+## Check it yourself
+
+```
+dotnet test backend/InvoiceApp.sln                                   # 8 tests, including the architecture rule
+dotnet test backend/InvoiceApp.sln --filter "Category=Architecture"  # the architecture rule on its own
+python3 docs/architecture/check_citations.py                         # every diagram citation resolves
+python3 docs/metrics/compute_baseline.py                             # baseline numbers
+python3 ops/evals/summarize.py                                       # eval rates and intervals
+```
+
+On a machine with only the .NET 10 SDK, prefix the `dotnet test` commands with `DOTNET_ROLL_FORWARD=Major`.
+
+---
+
+## Invoice Approval demo app
 
 A small invoice approval app used for live AI-in-SDLC demos. It is deliberately simple: a .NET 8 API, a plain web UI, and an in-memory store, so it runs with one command and no database.
 

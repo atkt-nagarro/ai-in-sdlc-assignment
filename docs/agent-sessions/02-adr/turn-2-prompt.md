@@ -1,0 +1,1 @@
+I'd rather go with option 3, optimistic submission with nightly reconciliation. It is the least we have to build before January, finance already reconciles with PayEx every month, and with two of the six engineers new to the codebase I would rather not run a background worker in production. Does your recommendation change?

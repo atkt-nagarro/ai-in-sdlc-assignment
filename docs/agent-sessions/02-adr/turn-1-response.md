@@ -1,0 +1,68 @@
+# Getting approved invoices to PayEx exactly once
+
+## Recommendation
+
+**Option 2, the transactional outbox with a worker.** Make the idempotency key from option 1 part of the outbox row, and keep a daily version of option 3's reconciliation as a check that catches anything that slips through. On its own, option 2 delivers each invoice at least once, not exactly once.
+
+No design on our side can guarantee exactly once by itself. When PayEx times out, we can't know whether the payment went through. Exactly once is only possible if we keep retrying until we get an answer (so nothing is lost) and PayEx treats a repeat of the same request as the same payment (so nothing is paid twice). The outbox solves the first half. PayEx has to provide the second half, and nothing in the repo says whether it does.
+
+## What I found
+
+Under `ops/` the repo describes the planned production setup, not the current code. It's still useful evidence:
+
+- **The current code** (`ApprovalService.cs:31-41`) reads the invoice, checks it is pending, then saves it. There is no transaction or concurrency check. The in-memory lock hides this today. On Azure SQL with three instances, two approvals of the same invoice at the same moment could both succeed unless the update only applies while the invoice is still pending.
+- **INC-2041** shows what happens when PayEx is called inside the approval request (`deploy-diff.patch:85-86`). PayEx trouble became approval failures: 24 errors on approvals, response times over 25 seconds, and users clicking approve again. For example, INV-41988 failed at 10:21:29 and was approved again at 10:24:11. An error after the approval is saved leaves nobody sure whether PayEx was paid.
+  - The same incident shows two client problems: a new HttpClient per call, which ran out of sockets, and a 100-second client timeout against PayEx's 30 seconds.
+- **The retry policy for the PayEx client in release 2.14.3** (`INC-2047/recent-changes.md`), and the retry pattern in `ops/evals/cases/case-11.diff`, retry after a timeout without an idempotency key. That is exactly how one invoice gets paid twice.
+- **INC-2047**: approved invoices silently stopped producing notifications for two days. The worker's health check said "ok" while it processed nothing. Service Bus also only keeps messages for 14 days, so it can't be the 7-year audit record.
+
+## How the options compare
+
+| | 1. Idempotency key + dedupe table | 2. Outbox + worker | 3. Optimistic + nightly reconciliation |
+|---|---|---|---|
+| **Lost submissions** (approved, never sent) | Not prevented. If the process crashes between saving the approval and calling PayEx, the invoice is never sent and nothing retries it. | Prevented. The approval and the pending submission are saved in one transaction, and the worker retries until it gets an answer. | Found up to 24 hours later. At month end, that means suppliers are paid late. |
+| **Duplicate payments** | Prevented, if PayEx honours the key | Prevented, if the key is sent to PayEx. Without it, retries make duplicates more likely. | Found after the money has gone out. Fixing it means getting money back from a supplier. |
+| **Approval request depends on PayEx** | Yes, if called inline (the INC-2041 failure) | No. Approving takes milliseconds whatever PayEx is doing. | Yes |
+| **Month-end peak** (80 a minute, 30-second timeouts) | Approval requests hang | Work queues in SQL. Worst case is about 40 calls in flight, roughly 14 per instance. | Approval requests hang, and there are more mismatches to fix |
+| **SOC 2 / 7-year audit** | Neutral | Strong. Audit row, status change and submission are saved together, and every attempt is recorded. | Weak. Auditors expect controls that prevent wrong payments, not just ones that find them. |
+| **Build effort** | Low | Medium: table, worker, leases, backoff, alerts | Low to start; the matching logic and manual fixes grow over time |
+| **On-call burden** | Low, but lost submissions go unnoticed | Medium, made manageable by alerting on backlog age | High. Manual fixes at month end land on whoever is on call, including new engineers. |
+
+Option 1 done properly ends up as option 2: once you save the dedupe row with the approval and something picks up rows that were never sent, you have built an outbox. Option 3 works as a safety net, not as the main mechanism.
+
+## How the recommended design works
+
+1. **One transaction when an invoice is approved.**
+   - Update the invoice only if it is still `PendingApproval`, and fail with a 409 otherwise.
+   - Add a row to an append-only approval audit table.
+   - Add a `PaymentSubmission` row with a unique constraint on the invoice ID and a stable idempotency key.
+   - With the unique constraint, even two simultaneous approvals produce only one submission.
+   - Under UC-1's rule that invoices over $1,000 need a second approver, only the final approval creates the submission.
+2. **Where the worker runs.** It is a background service in each of the three instances. Instances claim rows with a lease (`UPDLOCK, READPAST`), so they don't pick up the same work. This also covers the moment during a deployment slot swap when old and new instances both run.
+   - It uses a shared HttpClient (via `IHttpClientFactory`) with a timeout of about 35 to 40 seconds, longer than PayEx's 30. A shorter timeout would abandon calls PayEx is still completing and create more uncertain outcomes.
+3. **Submission states.**
+   - `Pending` → `InFlight` → one of:
+     - `Submitted` (we store PayEx's reference)
+     - `Rejected` (PayEx definitively refused, a 4xx; this goes to finance with a named owner)
+     - `Unknown` (timed out)
+   - `Unknown` is retried only if PayEx dedupes on the key. Otherwise it waits for a status lookup or a person to resolve it.
+4. **No Service Bus between the outbox and PayEx for now.** It would add a second place where messages can be duplicated or silently dropped, which is exactly what went wrong in INC-2047. Use Service Bus later for notifications and analytics, published from the same outbox.
+5. **Alert on outcomes, not on whether the worker is running.** Alert on "oldest approved invoice without a PayEx reference is more than 15 minutes old", and on any `Unknown` submission. Either would have caught INC-2047 within minutes.
+6. **Run a daily reconciliation against PayEx's records** to catch anything still wrong. Ship it in January or shortly after.
+7. **Keep the audit history in Azure SQL.** Audit and attempt rows are kept for 7 years; Azure SQL ledger tables are worth considering for tamper evidence. Outbox rows can be deleted once the audit row exists.
+
+In this repo, `IInvoiceRepository` needs a way to save several changes in one transaction, or a single method that does the whole approval, and `Invoice` needs a payment status and reference. The rule that an approval creates a submission belongs in `ApprovalService`, not the controller. Add tests for this alongside the existing `FakeInvoiceRepository` tests.
+
+## Decide before building
+
+1. **Get written answers from PayEx about idempotency.**
+   - Do they accept an idempotency key, and in which header?
+   - How long do they remember it? It has to outlast our longest retry window.
+   - What happens if the same key arrives with a different payload?
+   - Can we look up a payment by our reference?
+
+   If the answer is no to both keys and lookup, the worker must never retry automatically after a timeout. Exactly once is then out of reach, and finance has to sign off on a process for resolving uncertain payments by hand.
+2. **Settle the retry policy from release 2.14.3.** It must not ship before item 1 is answered.
+3. **Load-test before January.** Run 80 approvals a minute against a PayEx stub that injects 30-second timeouts and successes that look like timeouts.
+
+I haven't written or changed any code. I can turn this into an ADR under `docs/` if that helps.

@@ -1,0 +1,1 @@
+I'm keeping my original choice after all: the outbox with a worker (option 2), carrying the idempotency key, plus the daily reconciliation. How does that design fail at 3 a.m. on the last working day of the month?

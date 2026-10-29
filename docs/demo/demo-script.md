@@ -5,7 +5,7 @@ Record with Teams (Meeting, Share screen, Record) or QuickTime (File, New Screen
 **Before you start:**
 - Terminal at the repository root, font size 16.
 - VS Code with the Markdown preview open, so the Mermaid diagrams render.
-- Run the test once to warm the build. If your machine only has the .NET 10 SDK, `export DOTNET_ROLL_FORWARD=Major`.
+- Run the tests once to warm the build. They run as they are on .NET 8 or newer, because the test project sets `RollForward=Major`.
 
 | Time | Show | Say (in your own words) |
 | --- | --- | --- |

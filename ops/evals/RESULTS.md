@@ -64,7 +64,7 @@ The smaller model missed case-11 (the duplicate-payment retry) and case-09 in al
 
 ## Scoring reliability
 
-A second scorer re-scored all 108 reviews (72 main plus 36 probe). It was a separate agent working blind from the same answer key, told not to open my scores. Its verdicts are in [second-scorer.json](second-scorer.json).
+A second scorer re-scored all 108 reviews (72 main plus 36 probe). It was a separate agent working blind from the same answer key, told not to open my scores. Its verdicts are in [second-scorer.json](second-scorer.json). Its prompt, and a scan of its session showing it never opened my scores, are in [docs/agent-sessions/03-second-scorer](../../docs/agent-sessions/03-second-scorer/).
 
 - **Agreement:** 107 of 108 (99.1%), Cohen's kappa 0.98.
 - **The one disagreement:** run 6, case-06. I had scored it clean. The second scorer called it a false alarm, and under the key's own rule it is right. Unlike runs 1–5, that review never says it found no defects, and its findings list asserts two test failures that would not happen (an `InRange` type error, an exact-exception mismatch). Its first finding, that the hunk header does not match the body, is true. I changed my score to false alarm.

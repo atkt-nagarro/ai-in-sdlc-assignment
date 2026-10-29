@@ -25,7 +25,7 @@ python3 docs/metrics/compute_baseline.py                             # baseline 
 python3 ops/evals/summarize.py                                       # eval rates and intervals
 ```
 
-On a machine with only the .NET 10 SDK, prefix the `dotnet test` commands with `DOTNET_ROLL_FORWARD=Major`.
+The test project sets `RollForward=Major`, so the `dotnet test` commands also run on a machine that only has a newer .NET, such as .NET 10. Running the app itself on such a machine needs `DOTNET_ROLL_FORWARD=Major dotnet run --project backend/src/InvoiceApp.Api`.
 
 ---
 

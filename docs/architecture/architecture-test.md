@@ -18,8 +18,8 @@ dotnet test backend/InvoiceApp.sln --filter "Category=Architecture"
 ```
 
 CI already runs it, because `.github/workflows/ci.yml` runs every test in the
-solution. On a machine that has only the .NET 10 SDK, as mine does, the net8.0
-test host needs `DOTNET_ROLL_FORWARD=Major` in front of the command.
+solution. The test project sets `RollForward=Major`, so the same command also
+runs on a machine that only has a newer .NET, as mine does (.NET 10).
 
 ## Why this rule and not another
 

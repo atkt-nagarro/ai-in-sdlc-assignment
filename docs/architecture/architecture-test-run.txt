@@ -1,0 +1,21 @@
+# Architecture test: captured runs (2026-10-29T17:25Z, dotnet SDK 10.0.301, DOTNET_ROLL_FORWARD=Major)
+
+## 1. As committed
+$ dotnet test backend/InvoiceApp.sln --filter "Category=Architecture"
+Passed!  - Failed:     0, Passed:     1, Skipped:     0, Total:     1, Duration: 2 ms - InvoiceApp.Tests.dll (net8.0)
+
+## 2. Deliberate violation: ApprovalService news up an HttpClient (it compiles, because ImplicitUsings brings in System.Net.Http)
+ 1 file changed, 1 insertion(+)
++    private static readonly HttpClient PayEx = new();
+$ dotnet build backend/InvoiceApp.sln
+Build succeeded.
+$ dotnet test backend/InvoiceApp.sln --filter "Category=Architecture"
+Failed InvoiceApp.Tests.DomainDependencyTests.Domain_HasNoWebHttpOrStorageDependencies [1 ms]
+InvoiceApp.Domain must not depend on web, HTTP, storage or application code, but it references: System.Net.Http
+Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1, Duration: 1 ms - InvoiceApp.Tests.dll (net8.0)
+
+## 3. Violation reverted
+$ dotnet test backend/InvoiceApp.sln --filter "Category=Architecture"
+Passed!  - Failed:     0, Passed:     1, Skipped:     0, Total:     1, Duration: 1 ms - InvoiceApp.Tests.dll (net8.0)
+$ dotnet test backend/InvoiceApp.sln
+Passed!  - Failed:     0, Passed:     8, Skipped:     0, Total:     8, Duration: 3 ms - InvoiceApp.Tests.dll (net8.0)

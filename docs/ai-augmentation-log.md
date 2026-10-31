@@ -11,7 +11,7 @@ The assignment asks for agent output, and evidence of how it was used. This page
 | `claude-haiku-4-5-20251001` | through the corporate gateway | Eval sensitivity probe only |
 | Mermaid MCP (`mcp-mermaid`) | 0.4.1, local `svg` output (local PNG previews only for my visual checks) | Drawing, validating and rendering the diagrams |
 | Playwright | 1.64.1, headless Chromium | Recording the demo video |
-| macOS `say` | voice Daniel (English, UK) | Synthesised narration for the demo video |
+| ffmpeg | 8.1.2 | Cleaning up my recorded narration and fitting it to the video's captions |
 
 I also used Claude Code as a working assistant throughout: reading the codebase and the incident packs, drafting these documents, writing the scripts, and checking numbers. That session is not exported; it stayed in my local Claude Code history. Measured numbers come from scripts in this repository or cited files, and estimates are labelled as such. The checks on agent output are described per task below.
 
@@ -27,7 +27,7 @@ I also used Claude Code as a working assistant throughout: reading the codebase 
 | 4. Review eval | 72 isolated reviewer sessions (3 runs × 12 cases × 2 conditions), plus 36 probe sessions | [ops/evals/runs/](../ops/evals/runs/) | All outputs scored | Scored strictly against a key committed before the first run (`9e8defb`) | A blind second scorer (a separate Claude Code agent, same key plus notes on three cases, told not to open my scores) re-scored all 108 reviews: 107/108 agree, Cohen's kappa 0.98. Its case-03 note spelled out the mechanism the scoring used, so its agreement on the two Haiku case-03 misses is not independent. Its call on the one disagreement was adopted. Its prompt and a summary of what it opened are in [03-second-scorer](agent-sessions/03-second-scorer/), and its verdicts in [second-scorer.json](../ops/evals/second-scorer.json). |
 | 5. Trifecta audit | Checked the Claude Code settings keys against the current docs | working-assistant session, not exported | `permissions`, `defaultMode: dontAsk`, `sandbox.network.allowedDomains` with `strictAllowlist`, `disabledMcpjsonServers`, `blockReadsOutsideWorkingDirectories` | The final review found that `allowedDomains` alone only pre-approves hosts. `strictAllowlist` and `dontAsk` were added after the sandboxing docs confirmed the behaviour | Profile JSON validated; evidence lines in the audit checked one by one |
 | 5. Measurement plan | Wrote and ran the baseline script; checked the `az` and `gh` commands | [baseline-captured.txt](metrics/baseline-captured.txt) | Numbers as computed | Added 2.13.4 to the release list after rereading INC-2041 (CFR 2/5, not 2/4) | `compute_baseline.py` output matches the plan; `az` commands checked with `--help` |
-| 8. Demo video | Produced the whole video. A scripted Playwright recording of the rendered deliverables and the running app, with the tests run live, narration synthesised with macOS `say` from the demo script, and captions on screen | [narration-script.md](demo/narration-script.md) | The video as recorded, 8 min 41 s | Nothing was faked: the app is the real app, the git change is the real one-line change, and the test results match the captured runs. The terminal is a scripted panel that trims the dotnet output | Frames checked against the narration; the end card says how the video was made |
+| 8. Demo video | Produced the screen recording: a scripted Playwright run of the rendered deliverables and the running app, with the tests run live and captions on screen. Then cleaned up my recorded narration (noise reduction, levels) and fitted each line to its caption | [narration-script.md](demo/narration-script.md) | The video, 8 min 41 s, narrated in my own voice | Replaced the first, synthesised narration with my recording. Nothing in the picture was faked: the app is the real app, the git change is the real one-line change, and the test results match the captured runs. The terminal is a scripted panel that trims the dotnet output | Each line placed on its caption, a few slightly sped up to fit; frames checked against the narration; the end card says how the video was made |
 
 ## Cost of the agent sessions
 
@@ -39,7 +39,7 @@ I also used Claude Code as a working assistant throughout: reading the codebase 
 | ADR sparring (four turns) | 1 | $1.00 |
 | Mermaid MCP diagram draft | 1 | $0.65, plus $0.78 for a discarded first run |
 | Blind second scoring | 1 | not reported; the tool showed about 183k tokens, recorded only in the working-assistant session |
-| Demo video | 1 | no API cost for the recording and narration, which ran locally; the scripting was part of the working-assistant session |
+| Demo video | 1 | no API cost: the screen recording and the audio edit ran locally; the scripting was part of the working-assistant session |
 
 ## Where the agent was wrong, across tasks
 

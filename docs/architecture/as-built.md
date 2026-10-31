@@ -109,7 +109,7 @@ flowchart LR
 | C42 | Service reads the invoice | `backend/src/InvoiceApp.Domain/ApprovalService.cs:62` | `_repository.GetById(invoiceId)` |
 | C43 | Service saves the invoice | `backend/src/InvoiceApp.Domain/ApprovalService.cs:39` | `_repository.Update(invoice);` |
 | C44 | CI builds and tests | `.github/workflows/ci.yml:17-18` | `dotnet test backend/InvoiceApp.sln` |
-| C45 | Tests reference Domain only | `backend/tests/InvoiceApp.Tests/InvoiceApp.Tests.csproj:15` | `InvoiceApp.Domain.csproj` |
+| C45 | Tests reference Domain only | `backend/tests/InvoiceApp.Tests/InvoiceApp.Tests.csproj:16` | `InvoiceApp.Domain.csproj` |
 | C46 | e2e has config, no tests | `e2e/playwright.config.ts:4` | `testDir: './tests'` |
 
 ## Sequence: approving an invoice

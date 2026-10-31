@@ -1,6 +1,6 @@
 # Blind second scorer
 
-A separate Claude Code agent (`claude-opus-5-5`) re-scored all 108 reviews from the answer key alone.
+A separate Claude Code agent (`claude-opus-5-5`) re-scored all 108 reviews from the answer key and the notes on cases 03, 06 and 09 in its prompt.
 
 - **Prompt:** [prompt.md](prompt.md), verbatim.
 - **Output:** [ops/evals/second-scorer.json](../../../ops/evals/second-scorer.json), all 108 verdicts with a reason each.

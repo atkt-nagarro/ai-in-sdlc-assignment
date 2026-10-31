@@ -1,15 +1,8 @@
-# Demo video script (about 9 minutes 40; the brief allows 8 to 10)
+# Demo video plan
 
-The recorded video, [demo.mp4](demo.mp4) (8 min 41 s), follows this plan. Its exact narration is in [narration-script.md](narration-script.md).
+The recorded video, [demo.mp4](demo.mp4) (8 min 41 s), follows this plan; the slots below add up to about 9 minutes 40. Its exact narration is in [narration-script.md](narration-script.md).
 
-Record with Teams (Meeting, Share screen, Record) or QuickTime (File, New Screen Recording), then export MP4. Upload to OneDrive or SharePoint with "anyone in the organisation can view", and paste the link into the README index.
-
-**Before you start:**
-- Terminal at the repository root, font size 16.
-- VS Code with the Markdown preview open, so the Mermaid diagrams render.
-- Run the tests once to warm the build. They run as they are on .NET 8 or newer, because the test project sets `RollForward=Major`.
-
-| Time | Show | Say (in your own words) |
+| Time | Show | Say |
 | --- | --- | --- |
 | 0:00–0:40 | README index | "Invoice Approval goes tier-2 in January, with PayEx and a 24x7 rotation. Here are the four things I own before go-live, and the evidence behind each." |
 | 0:40–2:00 | `docs/architecture/as-built.md`: the container view, then the sequence diagram | "Every box and arrow cites a file and line. A script checks all 69." Run `python3 docs/architecture/check_citations.py`. Open `docs/agent-sessions/01-mermaid/`: "This is what the agent drew with the Mermaid MCP, on a clean checkout. All 107 of its citations resolve, and one of its inferences was wrong: it thought port 5000 only comes from the launch profile." Point at that row. |
@@ -22,5 +15,3 @@ Record with Teams (Meeting, Share screen, Record) or QuickTime (File, New Screen
 | 7:45–8:30 | `docs/security/lethal-trifecta-audit.md` | "All three legs are present. I removed external communication: no browser, no web, a strict sandbox egress allowlist in dontAsk mode, read-only identity. A human posts." Show `oncall-agent-settings.json`. |
 | 8:30–9:15 | `docs/metrics/measurement-plan.md` | Run `python3 docs/metrics/compute_baseline.py`. "Lead time proxy median 58 hours; change failure rate 2 of 5 releases. Review turnaround can't be measured yet: the CI export has PR runs but no review events. Here's the query for day one." |
 | 9:15–9:40 | `docs/ai-augmentation-log.md` | "This is where I used the agent, what I kept, and what I threw away." |
-
-Keep each section to its slot. If you run long, shorten the ADR walkthrough, not the evidence.

@@ -28,6 +28,8 @@ gh api 'repos/NITIN1670/ai-in-sdlc-assignment/actions/runs?branch=main&head_sha=
 
 ## The live baseline: definition, source and query
 
+Names in angle brackets are identifiers this repository does not contain yet: `<org>` is the team's GitHub organisation, and `<app>`, `<rg>` and `<app-resource-id>` are the production App Service, its resource group and its resource ID.
+
 ### 1. Lead time for changes
 
 **Definition:** first commit authored on a PR → that change running in production. Report median and p90 per week.

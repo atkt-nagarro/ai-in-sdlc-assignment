@@ -23,4 +23,4 @@ The change looks responsible, and that is why it gets through review: it adds re
 
 **Why I chose it:** I wanted a clean case that looks risky. The reviewer has to trace both code paths to see that nothing changed, and a noisy reviewer raises its false alarms exactly there.
 
-The diff was produced with `diff -u` against the real `backend/src/InvoiceApp.Domain/ApprovalService.cs`. With it applied, the full test suite passes ([case-12-test-run.txt](case-12-test-run.txt)). The false alarms this case invites are "approve now clears the note" and "the validation order changed". Neither is true here, and that is what the case tests.
+The diff was produced with `diff -u` against the real `backend/src/InvoiceApp.Domain/ApprovalService.cs`. With it applied, the full test suite passes ([case-12-test-run.txt](case-12-test-run.txt)): eight tests, the seven the answer key mentions plus the architecture test added after it. The false alarms this case invites are "approve now clears the note" and "the validation order changed". Neither is true here, and that is what the case tests.

@@ -64,7 +64,7 @@ The smaller model missed case-11 (the duplicate-payment retry) and case-09 in al
 
 ## Scoring reliability
 
-A second scorer re-scored all 108 reviews (72 main plus 36 probe). It was a separate agent working blind from the same answer key, told not to open my scores. Its verdicts are in [second-scorer.json](second-scorer.json). Its prompt, and a scan of its session showing it never opened my scores, are in [docs/agent-sessions/03-second-scorer](../../docs/agent-sessions/03-second-scorer/).
+A second scorer re-scored all 108 reviews (72 main plus 36 probe). It was a separate agent working blind from the same answer key, told not to open my scores. Its prompt also carried notes on cases 03, 06 and 09. The case-09 note repeats the key, and the case-06 note confirms a fact about the fixture but leaves the verdict open. The case-03 note spells out the mechanism I scored on, so its agreement with me on the two Haiku case-03 misses is not independent. Its verdicts are in [second-scorer.json](second-scorer.json). Its prompt, and a scan of its session showing it never opened my scores, are in [docs/agent-sessions/03-second-scorer](../../docs/agent-sessions/03-second-scorer/).
 
 - **Agreement:** 107 of 108 (99.1%), Cohen's kappa 0.98.
 - **The one disagreement:** run 6, case-06. I had scored it clean. The second scorer called it a false alarm, and under the key's own rule it is right. Unlike runs 1–5, that review never says it found no defects, and its findings list asserts two test failures that would not happen (an `InRange` type error, an exact-exception mismatch). Its first finding, that the hunk header does not match the body, is true. I changed my score to false alarm.
@@ -81,4 +81,5 @@ A second scorer re-scored all 108 reviews (72 main plus 36 probe). It was a sepa
 
 - `runs/baseline/run-{1,2,3}`, `runs/agents-md/run-{4,5,6}`, `runs/probe-haiku/run-{1,2,3}`: raw JSON and the review text for every case
 - [results.csv](results.csv), [results-probe-haiku.csv](results-probe-haiku.csv): one scored row per case per run
-- [summary.txt](summary.txt), [summary-probe-haiku.txt](summary-probe-haiku.txt): output of `python3 ops/evals/summarize.py`
+- [summary.txt](summary.txt): output of `python3 ops/evals/summarize.py`
+- [summary-probe-haiku.txt](summary-probe-haiku.txt): output of `python3 ops/evals/summarize.py ops/evals/results-probe-haiku.csv probe-haiku`; the last argument names the run folder the costs are read from

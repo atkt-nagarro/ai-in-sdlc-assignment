@@ -7,7 +7,7 @@
 | Cases | The 10 fixed cases, plus [case-11](cases/case-11.diff) (defect) and [case-12](cases/case-12.diff) (clean) added by me ([why these two](cases/README-added-cases.md)). 9 defect cases, 3 clean. |
 | Prompt | v1, verbatim from `README.md` |
 | Model | `claude-opus-5-5`, effort `high`, Claude Code 2.1.306 |
-| Isolation | One fresh session per case, in an empty temp directory. No MCP servers, no session persistence. File tools can't reach outside the directory, and no tool call was denied in any run. Harness: [run-eval.sh](run-eval.sh). |
+| Isolation | One fresh session per case, in a new temp directory holding only the prompt file and the harness's output files. No MCP servers, no session persistence. File tools can't reach outside the directory, and no tool call was denied in any run. Harness: [run-eval.sh](run-eval.sh). |
 | Runs | 1–3 baseline (no context file). 4–6 with the single change. |
 | The one change | The context file: the repository's `CLAUDE.md` (which imports `AGENTS.md`) placed in the working directory. Nothing else differs. |
 | Scoring | Strict, against [answer-key.md](answer-key.md). The key was committed in `9e8defb` at 17:23:16Z, and the first run started at 17:23:26Z. Raw outputs are in `runs/`; scores in [results.csv](results.csv). |
@@ -36,14 +36,14 @@ The ten fixed cases on their own, the set every submission shares (8 defect, 2 c
 
 ## Was the change an improvement?
 
-**No.** Caught rates are identical. The context file added one false alarm, 1/9 against 0/9. A paired comparison by case gives the baseline better on one case, worse on none, with 11 tied (sign test p = 1.0).
+**No.** Caught rates are identical. Runs with the context file had one false alarm, 1/9 against 0/9. A paired comparison by case gives the baseline better on one case, worse on none, with 11 tied (sign test p = 1.0).
 
 What the context file did change:
 
-- **Cost and time:** median per review $0.072 against $0.055 (+31%), and 24 s against 20 s.
+- **Cost and time:** median estimated cost per review $0.072 against $0.055 (+31%), from Claude Code's `total_cost_usd` at list price, and 24 s against 20 s.
 - **Repository-specific findings.** With AGENTS.md the reviewer added convention breaches the baseline could not know about: no tests for a new rule, `Handle(...)` bypassed, business logic in a controller.
-  - On case-09 it caught a second true inaccuracy in all three runs: the demo accounts live in `appsettings.json`, not "the in-memory store".
-- **More confidence in an unverifiable claim.** On case-02 it rated "`_queries` probably doesn't exist, so this won't build or won't work" at medium to medium-high, because AGENTS.md says there is no database. The baseline runs rated the same claim low. The diff cannot show whether `_queries` exists.
+  - On case-09 it also suggested, at low confidence in all three runs, that the demo accounts may not be in "the in-memory store". That is true: they are in `appsettings.json`.
+- **More confidence in a claim the diff alone cannot settle.** On case-02 it rated "`_queries` probably doesn't exist, so this won't build or won't work" at medium to medium-high, because AGENTS.md says there is no database. The baseline runs rated the same claim low. The diff cannot show whether `_queries` exists.
 
 My verdict: keep AGENTS.md for the repository-specific findings it adds, and accept that this eval cannot show it improves detection. If anything it made the reviewer slightly noisier.
 
@@ -51,7 +51,7 @@ My verdict: keep AGENTS.md for the repository-specific findings it adds, and acc
 
 Not very, and the data says why.
 
-- **Ceiling.** At 27/27 the lower 95% bound is 87.5%. Treating the three runs of a case as independent overstates the evidence, because the same case gives the same answer every time. Counted by case, 9/9 only bounds the catch rate above 70%.
+- **Ceiling.** At 27/27 the lower 95% bound is 87.5%. Treating the three runs of a case as independent overstates the evidence, because every defect case got the same verdict in all six runs. Counted by case, 9/9 only bounds the catch rate above 70%.
 - **False alarms rest on 3 clean cases.** 0/9 is compatible with a true false-alarm rate of up to 30%, and 1/9 with up to 44%. One review flipping on one case moved the rate by 11 points.
 - **A large real difference barely registers.** As a sensitivity check, outside the one-change comparison, I ran the same set with a smaller model:
 
@@ -60,20 +60,20 @@ Not very, and the data says why.
 | `claude-opus-5-5` (runs 1–3) | 27/27 = 100% | 0/9 | $0.055 |
 | `claude-haiku-4-5-20251001` ([probe](results-probe-haiku.csv)) | 19/27 = 70% (CI 52–84%) | 1/9 (CI 2–44%) | $0.017 |
 
-The smaller model missed case-11 (the duplicate-payment retry) and case-09 in all three runs. It missed case-03 twice by describing `ToZero` as tie-breaking. It also raised one false alarm, a "race condition" in a correct timing assertion. That is a gap of 30 points, yet paired by case it is 4 better, 0 worse and 8 tied, which gives p = 0.125. With 12 cases this eval can just about separate a weak reviewer from a strong one. It cannot detect the kind of change a prompt tweak or a context file makes.
+The smaller model missed case-11 (the duplicate-payment retry) and case-09 in all three runs. It missed case-03 twice by describing `ToZero` as tie-breaking. It also raised one false alarm, a "race condition" in a correct timing assertion. That is a gap of 30 points, yet paired by case it is 4 better, 0 worse and 8 tied, which gives p = 0.125. With 12 cases this eval can just about separate a weak reviewer from a strong one. By case, the sign test cannot reach p < 0.05 unless at least 6 of the 12 cases move the same way, and the context file moved one.
 
 ## Scoring reliability
 
-A second scorer re-scored all 108 reviews (72 main plus 36 probe). It was a separate agent working blind from the same answer key, told not to open my scores. Its prompt also carried notes on cases 03, 06 and 09. The case-09 note repeats the key, and the case-06 note confirms a fact about the fixture but leaves the verdict open. The case-03 note spells out the mechanism I scored on, so its agreement with me on the two Haiku case-03 misses is not independent. Its verdicts are in [second-scorer.json](second-scorer.json). Its prompt, and a scan of its session showing it never opened my scores, are in [docs/agent-sessions/03-second-scorer](../../docs/agent-sessions/03-second-scorer/).
+A second scorer re-scored all 108 reviews (72 main plus 36 probe). It was a separate agent working blind from the same answer key, told not to open my scores. Its prompt also carried notes on cases 03, 06 and 09. The case-09 note repeats the key, and the case-06 note confirms a fact about the fixture but leaves the verdict open. The case-03 note spells out the mechanism I scored on, so its agreement with me on the two Haiku case-03 misses is not independent. Its verdicts are in [second-scorer.json](second-scorer.json). Its prompt, and my summary of a scan of its session, which found no command naming my score files, are in [docs/agent-sessions/03-second-scorer](../../docs/agent-sessions/03-second-scorer/).
 
 - **Agreement:** 107 of 108 (99.1%), Cohen's kappa 0.98.
 - **The one disagreement:** run 6, case-06. I had scored it clean. The second scorer called it a false alarm, and under the key's own rule it is right. Unlike runs 1–5, that review never says it found no defects, and its findings list asserts two test failures that would not happen (an `InRange` type error, an exact-exception mismatch). Its first finding, that the hunk header does not match the body, is true. I changed my score to false alarm.
 
 ## What I would change before trusting it for comparisons
 
-- **Harder cases**, so strong models do not all score 100%: defects that need two files, or knowledge of the conventions, to see.
+- **Harder cases**, so a strong model does not score 100%: defects that need two files, or knowledge of the conventions, to see.
 - **As many clean cases as defect cases.** False alarms are what make people stop reading reviews, and 3 clean cases cannot measure them.
-- **Score noise as well as verdicts.** The answer key promised a separate count of spurious findings on defect cases. I recorded extra findings in the `notes` column but did not classify every one as true or spurious, so that count is not reported here. The next round should classify them.
+- **Score noise as well as verdicts.** The answer key promised a separate count of spurious findings on defect cases. I noted some extra findings in the `notes` column but did not record or classify them all, so that count is not reported here. The next round should classify them.
 - **Fix the fixtures.** 7 of the 10 original diffs (02, 03, 04, 06, 07, 08, 10) have hunk headers that do not match their bodies. The reviewer noticed this on case-06 in 3 of 6 runs. I verified it, and scored it as true, not a false alarm.
 - **Keep the eval cases away from agents that have repository access.** The ADR sparring agent read `case-11.diff` and cited it as production history (see ADR-001).
 

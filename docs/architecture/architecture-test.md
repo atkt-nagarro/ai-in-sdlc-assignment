@@ -1,13 +1,13 @@
-# Architecture test: the Domain project stays free of web, HTTP and storage code
+# Architecture test: what the Domain assembly may reference
 
 ## The rule
 
 AGENTS.md says `InvoiceApp.Domain` holds "business rules, no web or storage
-code". Nothing enforced that. `DomainDependencyTests` now does: the Domain
-assembly may reference the base class library only, and not the parts of it
-that reach networks or databases (`System.Net*`, `System.Data*`). Anything
-else is a failure: ASP.NET Core, EF Core, SqlClient, Azure SDKs, or
-`InvoiceApp.Api` itself.
+code". Nothing enforced that. `DomainDependencyTests` now checks it through
+the Domain assembly's references: each must be named `System`, `System.*`,
+`netstandard` or `mscorlib`, and none may be `System.Net`, `System.Data` or
+anything under them. Anything else is a failure: ASP.NET Core, EF Core,
+SqlClient, Azure SDKs, or `InvoiceApp.Api` itself.
 
 Test: [`backend/tests/InvoiceApp.Tests/DomainDependencyTests.cs`](../../backend/tests/InvoiceApp.Tests/DomainDependencyTests.cs)
 
@@ -28,8 +28,10 @@ pull in exactly the dependencies this rule forbids. INC-2041 shows what
 happens when the payment call is wired in wherever it is convenient: release
 2.14.0 put the PayEx call inside the approval request and created a new
 `HttpClient` per call (`ops/incidents/INC-2041/deploy-diff.patch`). Keeping
-Domain free of HTTP and storage forces both behind interfaces in the API
-layer, which is where the outbox dispatcher in ADR-001 has to live anyway.
+Domain free of HTTP and storage assemblies means the code that uses them sits
+outside it, in `InvoiceApp.Api`, which is where the outbox dispatcher in
+ADR-001 has to live anyway. The test reads only Domain's references, so it
+would not have caught 2.14.0 itself.
 
 The rule also catches the violation the compiler does not. Domain's project
 file references no packages, so nobody can use EF Core or ASP.NET Core
@@ -54,8 +56,11 @@ Captured in [`architecture-test-run.txt`](architecture-test-run.txt):
 It reads `typeof(ApprovalService).Assembly.GetReferencedAssemblies()`, the
 assembly references the compiler actually emitted. That makes it cheap and
 needs no new package. The other side of that is that an unused project
-reference does not show up. That is acceptable, because an unused reference
-does no harm until something uses it, and then the test fails.
+reference does not show up, which is acceptable: it does no harm until code
+uses it, and then it shows up. The bigger gap is that the test judges each
+reference by name. Any name starting `System.` passes unless it falls under
+`System.Net` or `System.Data`, and storage written with base-library types
+such as `System.IO` passes too.
 
 The next rule I would add, once a PayEx client exists, is that no controller
 depends on it: only the outbox dispatcher may call PayEx. It is not written

@@ -33,6 +33,7 @@
   "sandbox": {
     "enabled": true,
     "allowUnsandboxedCommands": false,
+    "autoAllowBashIfSandboxed": false,
     "network": {
       "strictAllowlist": true,
       "allowedDomains": [

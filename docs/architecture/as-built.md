@@ -4,9 +4,9 @@ This describes upstream `0616158` (imported here as `7f877cc`), the code as comm
 
 ## How these diagrams were made
 
-1. **Agent draft.** Claude Code (`claude-opus-5-5`) drew both diagrams with the Mermaid MCP (`mcp-mermaid` 0.4.1, local SVG output only). It worked from a clean checkout of `7f877cc`, with `AGENTS.md` as its only instructions. The prompt, the full session and its answer are in [agent-sessions/01-mermaid](../agent-sessions/01-mermaid/): 34 turns, 2 render calls, $0.65.
-   - A first run in my working tree could see my own draft diagrams, so I set it aside ([discarded-run-saw-drafts](../agent-sessions/01-mermaid/discarded-run-saw-drafts/)) and re-ran on the clean checkout.
-2. **Its citations.** [`check_agent_citations.py`](check_agent_citations.py) resolves every file and line it cited: 107 of 107 ([output](agent-citation-check.txt)).
+1. **Agent draft.** Claude Code (`claude-opus-5-5`) drew both diagrams with the Mermaid MCP (`mcp-mermaid` 0.4.1, local SVG output only). It worked from a clean checkout of `7f877cc`, with `AGENTS.md` as its only instructions. The prompt, the full session and its answer are in [agent-sessions/01-mermaid](../agent-sessions/01-mermaid/): 34 turns and 2 render calls; Claude Code estimated $0.65 at list price.
+   - A first run in my working tree could see my own draft diagrams, so I set it aside and re-ran on the clean checkout.
+2. **Its citations.** [`check_agent_citations.py`](check_agent_citations.py) resolves every file and line in its two citation tables: 107 of 107 ([output](agent-citation-check.txt)).
 3. **Its claims.** After its run I drove the approval path against the running app with `curl` ([walkthrough](approval-path-walkthrough.txt)).
 4. **The diagrams below** are the corrected versions: its correct additions kept, the issues further down fixed, and all 69 citations re-checked by [`check_citations.py`](check_citations.py). Rendered SVGs are in [diagrams/](diagrams/).
 
@@ -193,11 +193,11 @@ sequenceDiagram
 | 2 | JSON is camelCase | Confirmed | Walkthrough shows `"customerName"`, `"status":"Approved"` |
 | 3 | Static files need no sign-in, and `/` serves `index.html` | Confirmed | `GET /` returns 200 with no token |
 | 4 | The 403 branch cannot happen with the shipped users | Confirmed | `demo.admin` approve returns 200 |
-| 5 | "Stored" means process memory, on one instance | Confirmed in part | Data survives sign-out and resets only on restart; more than one instance can't be tested here |
+| 5 | "Stored" means process memory, on one instance | Confirmed in part | Data survives sign-out in the walkthrough; loss on restart follows from the seeded singleton (`Program.cs:14`) but was not tested; more than one instance can't be tested here |
 | 6 | The stored object changes before `Update` runs | Right | `InMemoryInvoiceRepository.cs:27` returns the list element itself |
 | 7 | Two concurrent approvals can both pass `EnsurePending` | Right, not tested | `ApprovalService.cs:33-39` runs outside the repository lock |
 | 8 | A failed refresh shows an error after a stored approval | Right | `app.js:85-88` |
-| 9 | "Session expired." can never be seen | Right | `app.js:20` signs out, which hides `app-view`, the container of `decision-error` (`index.html:31,69`) |
+| 9 | "Session expired." can never be seen | Right in part | Hidden when raised: `app.js:20` signs out, which hides `app-view`, the container of `decision-error` (`index.html:31,69`). Nothing clears it, so it shows after the next sign-in on the same page (read from the code, not run) |
 | 10 | Other exceptions become a 500 | Right; framework default | n/a |
 | 11 | Port 5000 applies only through the launch profile | **Wrong** | Kestrel also listens on `http://localhost:5000` when nothing sets a URL. The walkthrough starts the app with no profile and no URL, and it logs exactly that. |
 
@@ -210,22 +210,22 @@ sequenceDiagram
    - `AuthController` has no role check.
 
    I drew them separately, with `ApiControllerBase.Handle` as the error-mapping step that approvals and submit share.
-3. **No build boundary.** Its view stops at the runtime. I added the CI workflow and the test project. The only automated check in this repository is part of how the system is built, and the test project referencing Domain alone is what makes the architecture test possible.
+3. **No build boundary.** Its view stops at the runtime. I added the CI workflow and the test project. The only automated check in this repository is part of how the system is built, and the test project's reference to Domain is what lets the architecture test read Domain's assembly references.
 
-It drew nothing that does not exist: no invented component, no system from `ops/` drawn as real, no wrong route. Its session shows why. It read the `AGENTS.md` warning about `ops/` and kept to it. Its one factual error is inference 11.
+It drew nothing that does not exist: no invented component, no system from `ops/` drawn as real, no wrong route. Its session shows why. It read the `AGENTS.md` warning about `ops/` and kept to it. Its clear factual error is inference 11; inference 9 is right only in part.
 
 ## What it found that I had missed
 
 - The browser keeps the session token in `sessionStorage` (`app.js:4,95,108`).
 - The UI throws away the approve response and never shows who approved or when. The tables show id, customer, amount and status only (`app.js:56-60`). For a service facing a SOC 2 audit, that matters.
 - `DiscountCalculator` and `IInvoiceRepository.GetByIds` exist, but nothing calls them.
-- A failed refresh after a stored approval shows an error, and "Session expired." can never be seen.
+- A failed refresh after a stored approval shows an error, and "Session expired." stays hidden until the user signs in again on the same page.
 
 ## Where the code departs from AGENTS.md
 
 - **Business rules in a controller:** `InvoicesController.Create` validates the customer name and the amount itself (`InvoicesController.cs:50-58`).
 - **Wrong base class:** `AuthController` inherits `ControllerBase`, not `ApiControllerBase` (`AuthController.cs:9`).
-- **Repository used directly:** `InvoicesController` calls the repository for list, get, create and delete (`InvoicesController.cs:25,43,60,75`).
+- **Repository used directly:** `InvoicesController` calls the repository for list, get, create and delete (`InvoicesController.cs:25,43,60,75`). AGENTS.md has no rule against this; I list it because those actions bypass `ApprovalService` and `Handle`.
 
 ## Other risks before production
 
@@ -234,9 +234,9 @@ It drew nothing that does not exist: no invented component, no system from `ops/
 
 ## How the diagrams were checked
 
-- [`check_citations.py`](check_citations.py) opens every cited file and confirms the symbol sits within a line of the cited line. Run it with `python3 docs/architecture/check_citations.py`; the result is at the end of [approval-path-walkthrough.txt](approval-path-walkthrough.txt).
+- [`check_citations.py`](check_citations.py) checks the 69 rows of the two citation tables: it opens each cited file and confirms the symbol sits within a line of the cited range. Run it with `python3 docs/architecture/check_citations.py`; the result is at the end of [approval-path-walkthrough.txt](approval-path-walkthrough.txt).
 - I ran the app with no launch profile and no URL, and drove the approval path with `curl` ([approval-path-walkthrough.txt](approval-path-walkthrough.txt)):
-  - **Without auth:** `GET /` returns 200; any `/api` call returns 401.
+  - **Without a token:** `GET /` returns 200 and login works; `GET /api/invoices` and an approve call return 401. The middleware exempts only login (`SessionAuthMiddleware.cs:19`).
   - **Decisions:** approve returns 200, a second approve 409, an unknown invoice 404, and a blank reject reason 400.
   - **Admin:** `demo.admin` also gets 200, so no configured user can reach the 403 branch.
   - **Ops route:** `POST /api/invoices/{id}/approve`, the route the INC-2041 logs show, is a 404 here. Those logs describe the planned system, not this code.

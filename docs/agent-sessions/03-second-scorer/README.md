@@ -2,7 +2,7 @@
 
 A separate Claude Code agent (`claude-opus-5-5`) re-scored all 108 reviews from the answer key and the notes on cases 03, 06 and 09 in its prompt.
 
-- **Prompt:** [prompt.md](prompt.md), verbatim.
+- **Prompt:** [prompt.md](prompt.md), verbatim except that my macOS username in the repository path is replaced with `user`.
 - **Output:** [ops/evals/second-scorer.json](../../../ops/evals/second-scorer.json), all 108 verdicts with a reason each.
 - **What it opened,** from a scan of its session:
   - The Read tool was used only on `ops/evals/answer-key.md`.

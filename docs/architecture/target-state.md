@@ -63,7 +63,7 @@ flowchart LR
 | --- | --- | --- |
 | Static web UI | Exists | `backend/src/InvoiceApp.Api/wwwroot/` |
 | API controllers and sign-in | Exists. Demo users come from `appsettings.json`, which is not fit for production. | `backend/src/InvoiceApp.Api/Controllers/`, `Auth/` |
-| ApprovalService | Exists; changes planned. It gains the second-approver rule for invoices over $1,000 (UC-1), and asks the repository for the outbox row on final approval. It stays free of storage code. | `backend/src/InvoiceApp.Domain/ApprovalService.cs`; ADR-001, steps 1 and 2 |
+| ApprovalService | Exists; changes planned. On final approval it asks the repository for the outbox row; if UC-1 ships, an invoice over $1,000 is final only after its second approver. It stays free of storage code. | `backend/src/InvoiceApp.Domain/ApprovalService.cs`; ADR-001, steps 1 and 2 |
 | SqlInvoiceRepository and unit of work | **Planned**, in the API layer behind `IInvoiceRepository`. Replaces `InMemoryInvoiceRepository`. | ADR-001, step 1; [architecture test](architecture-test.md) |
 | App Service, 3 instances | **Planned** | Scenario facts, `ops/incidents/INC-2041/README.md` |
 | Azure SQL: Invoices, ApprovalAudit, PaymentSubmission | **Planned**. Today the store is an in-memory list. | ADR-001, step 1 |
@@ -72,7 +72,7 @@ flowchart LR
 | Shared session store | **Planned**. `SessionStore` keeps tokens in process memory, which breaks with three instances. | ADR-001, consequences |
 | Key Vault for the PayEx key | **Planned** | ADR-001, step 4 |
 | Application Insights alerts | **Planned** | ADR-001, step 8 |
-| Service Bus topic | Provisioned in Azure. The brief says nothing uses it, while INC-2047 shows the planned deployment publishing invoice events to it. Either way it carries notifications only, never payments. | ADR-001, context and decision |
+| Service Bus topic | Provisioned in Azure. The brief says nothing uses it, while INC-2047 shows the planned deployment publishing invoice events to it. Either way the payment path does not use it. | ADR-001, context and decision |
 | PayEx | External | Scenario facts |
 
 ## Sequence: approving an invoice
@@ -133,11 +133,11 @@ sequenceDiagram
 
 ## What changes compared with today
 
-- **The approve request does nothing external.** It commits one transaction and returns, so a slow or broken PayEx cannot slow approvals (INC-2041).
-- **Persistence sits behind `IInvoiceRepository`.** A SQL repository in the API layer replaces the in-memory one. Domain stays free of storage code, which is exactly what the architecture test enforces.
+- **The approve request does nothing external.** It commits one transaction and returns, so approvals no longer wait on PayEx (INC-2041). The dispatcher still shares the instances and the database with them.
+- **Persistence sits behind `IInvoiceRepository`.** A SQL repository in the API layer replaces the in-memory one. Domain stays free of storage code; the architecture test fails if Domain references EF Core, SqlClient or anything else outside `System.*`, or anything under `System.Data` or `System.Net`.
 - **"Only pending invoices can be decided" moves into SQL.** It goes from an in-memory check (`EnsurePending`) to a conditional update, so it holds across three instances and concurrent clicks.
-- **One identity per payment.** Every attempt reuses one stored key and one stored payload. The dispatcher claims rows with a lease, so two instances never send the same row at once.
-- **Timeouts follow ADR step 6.** If PayEx dedupes, the dispatcher retries with the same key. If PayEx supports lookup by reference, it looks the payment up first. If neither, the row goes to a manual queue.
+- **One identity per payment.** Every attempt reuses one stored key and one stored payload. The dispatcher claims rows with a lease longer than the 40 s timeout, so two instances should not send the same row at once; if they do, the row's attempt count shows it.
+- **Timeouts follow ADR step 6.** If PayEx dedupes, the dispatcher retries with the same key, but only inside PayEx's key retention period, which PayEx has not stated yet. If PayEx supports lookup by reference, it looks the payment up first. If neither, the row goes to a manual queue.
 - **Alerts watch outcomes** (the oldest unpaid approval), not just whether the process is running. That is the lesson of INC-2047.
 
 Not shown here: the notification worker from INC-2047 and UC-2 partial approval. Neither changes this path, except that the payload carries the approved amount.

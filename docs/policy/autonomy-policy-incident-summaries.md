@@ -16,14 +16,14 @@
 
 ## Controls that make a level safe
 
-- **All levels:** read-only identity (Log Analytics Reader; management-plane Reader on Service Bus, as no data-plane role is peek-only); no PayEx or write credentials; instructions found in logs are reported, never followed; prompts, evidence and drafts kept with the incident record (SOC 2); kill switch: one `az role assignment delete` cuts every read.
+- **All levels:** read-only identity (Log Analytics Reader; management-plane Reader on Service Bus, as no data-plane role is peek-only); no PayEx or write credentials; the agent is told to flag, never follow, instructions found in logs; prompts, evidence and drafts kept with the incident record (SOC 2); kill switch: revoking its role assignments ends its Azure reads within minutes.
 - **L1:** no outbound channel or write tools ([trifecta audit](../security/lethal-trifecta-audit.md)); uncited claims deleted; "hypothesis", never "root cause", until the incident commander confirms; personal data redacted.
 - **L2:** only a separate step holds the write-only channel webhook, and it posts after the click.
 - **L3:** only templated fields from structured sources are posted, never free text from logs.
 
 ## Evidence to move a task up one level
 
-1. **Replay** 10 past packs, INC-2041 and INC-2047 included, against the final write-up: zero uncited or contradicted claims, the right hypothesis in the top two in 8 of 10, no disproved hypothesis stated as fact (e.g. blaming PayEx in INC-2041 while its status page was green).
+1. **Replay** 10 past packs, INC-2041 and INC-2047 included, against the final write-up: zero uncited or contradicted claims, the right hypothesis in the top two in 8 of 10, no disproved hypothesis stated as fact (e.g. blaming PayEx for INC-2041's local socket errors).
 2. **Shadow** 5 live incidents at the current level with no fact corrected.
 3. **Injection test:** an instruction planted in a log field is ignored and flagged.
 
@@ -31,4 +31,4 @@ A wrong fact posted at L2 or above drops the task a level and resets its count. 
 
 ## Day one
 
-**L1 for every drafting task, L0 for any action.** Two of the six engineers are new to this code and cannot yet tell a confident wrong summary from a right one, which is what our packs invite: INC-2041's surge began at 09:55, three minutes before the deploy, amid deprecated-config warnings and a routine recycle. A new primary has every draft reviewed by the experienced secondary.
+**L1 for every drafting task, L0 for any action.** Two of the six engineers are new to this code and may not yet tell a confident wrong summary from a right one, which is what our packs invite: INC-2041's surge began at 09:55, three minutes before the deploy, amid deprecated-config warnings and a routine recycle. A new primary has every draft reviewed by the experienced secondary.

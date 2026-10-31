@@ -1,6 +1,6 @@
 # NAGP AI in SDLC: Home Assignment 2
 
-The Invoice Approval service goes tier-2 in January, with a 24x7 rotation, a published SLO and PayEx payments. This repository holds what I would want to own before that happens. Every measured number comes from a script or a cited file in this repository; estimates are labelled as such.
+The Invoice Approval service goes tier-2 in January, with a 24x7 rotation, a published SLO and PayEx payments. This repository holds what I would want to own before that happens. The measured numbers come from scripts or cited files in this repository, and estimates are labelled as such.
 
 | # | Hand-in item | Where |
 | --- | --- | --- |
@@ -12,7 +12,7 @@ The Invoice Approval service goes tier-2 in January, with a 24x7 rotation, a pub
 | 6 | The risk audit, with a decision recorded | [lethal-trifecta-audit.md](docs/security/lethal-trifecta-audit.md) |
 | 7 | The measurement plan, with the two numbers captured | [measurement-plan.md](docs/metrics/measurement-plan.md) |
 | 8 | The 8 to 10 minute demo video | [demo.mp4](docs/demo/demo.mp4), 8 min 41 s (narration: [narration-script.md](docs/demo/narration-script.md); plan: [demo-script.md](docs/demo/demo-script.md)) |
-| 9 | AI augmentation logs | [ai-augmentation-log.md](docs/ai-augmentation-log.md), raw sessions in [docs/agent-sessions/](docs/agent-sessions/) and [ops/evals/runs/](ops/evals/runs/) |
+| 9 | AI augmentation logs | [ai-augmentation-log.md](docs/ai-augmentation-log.md), agent prompts and output in [docs/agent-sessions/](docs/agent-sessions/) and [ops/evals/runs/](ops/evals/runs/) |
 
 ## Check it yourself
 
